@@ -1,0 +1,76 @@
+:root {
+  --font-title: title, "Segoe UI", sans-serif;
+  --font-subtitle: subtitle, "Segoe UI", sans-serif;
+  --font-body: paragraph, "Segoe UI", sans-serif;
+
+  --fs-display: clamp(2.5rem, 6vw, 4.5rem);
+  --fs-700: clamp(1.9rem, 3.2vw, 2.5rem);
+  --fs-600: clamp(1.55rem, 2.4vw, 1.95rem);
+  --fs-500: clamp(1.25rem, 1.7vw, 1.5rem);
+  --fs-400: clamp(1.05rem, 1.4vw, 1.2rem);
+  --fs-300: 1rem;
+  --fs-200: 0.925rem;
+  --fs-100: 0.82rem;
+  --fs-caption: 0.74rem;
+
+  --lh-tight: 1.15;
+  --lh-normal: 1.45;
+  --lh-loose: 1.65;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-7: 2rem;
+  --space-8: 2.5rem;
+  --space-9: 3rem;
+
+  --radius-sm: 0.55rem;
+  --radius-md: 0.85rem;
+  --radius-lg: 1.15rem;
+  --radius-xl: 1.45rem;
+  --radius-2xl: 1.8rem;
+  --radius-round: 999px;
+
+  --shadow-1: 0 8px 24px rgba(2, 8, 24, 0.2);
+  --shadow-2: 0 18px 40px rgba(2, 8, 24, 0.28);
+  --shadow-3: 0 24px 70px rgba(2, 8, 24, 0.42);
+
+  --panel-max-width: 1180px;
+  --mobile-nav-height: 4.8rem;
+
+  --app-gradient-1: #4d89ff;
+  --app-gradient-2: #7eb5ff;
+  --app-gradient-3: #b8dcff;
+
+  --line-graph-color: rgba(132, 228, 255, 0.85);
+  --text-color: #f6f9ff;
+  --title-color: #f9fcff;
+  --text-muted: rgba(226, 237, 255, 0.86);
+  --text-soft: rgba(214, 229, 253, 0.73);
+
+  --accent-blue: #73b0ff;
+  --accent-cyan: #86e3ff;
+  --accent-soft: #e5f4ff;
+
+  --background-color-1: rgba(9, 21, 51, 0.45);
+  --background-color-2: rgba(6, 15, 38, 0.78);
+  --secondary-background-color-1: rgba(11, 24, 56, 0.72);
+  --secondary-background-color-2: rgba(8, 16, 37, 0.84);
+  --card-color-1: rgba(244, 249, 255, 0.18);
+  --card-color-2: rgba(240, 247, 255, 0.08);
+
+  --header-search-color: rgba(10, 24, 57, 0.72);
+  --nav-menu-search-color: rgba(9, 20, 50, 0.88);
+
+  --border-color: rgba(220, 236, 255, 0.24);
+  --border-color-strong: rgba(222, 238, 255, 0.42);
+  --focus-ring: 0 0 0 3px rgba(134, 227, 255, 0.45);
+}
