@@ -18,6 +18,7 @@ import { IoTriangleSharp } from "react-icons/io5";
 import { WeatherContext } from "@/app/context/weather-provider";
 import { PeriodContext } from "@/app/context/period-provider";
 import { PeriodType, WeatherDataResponse, WeatherType } from "@/app/types/types";
+import FavoriteButton from "../favorites/favorite-button";
 
 const CurrentCard = ({
   weatherData,
@@ -93,6 +94,7 @@ const CurrentCard = ({
             <p id="current-time">{getCurrentTime(weatherData?.timezone_offset)}</p>
             <p id="current-location">
               <ImLocation /> {weatherData?.name}, {weatherData?.country}
+              <FavoriteButton city={weatherData?.name} country={weatherData?.country} />
             </p>
             <p id="current-date">{formatDate(weatherData?.current.dt)}</p>
           </div>
