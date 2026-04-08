@@ -18,7 +18,12 @@ import { GiSnowflake2 } from "react-icons/gi";
 import CurrentCard from "./current-card";
 import HourlyCard from "./hourly-card";
 import DailyCard from "./daily-card";
-import { WeatherDataResponse } from "@/app/types/types";
+import { WeatherDataResponse, UnitsType } from "@/app/types/types";
+import AlertBanner from "../alerts/alert-banner";
+import AlertSettingsCard from "../alerts/alert-settings-card";
+import RecommendationsCard from "../recommendations/recommendations-card";
+import ActivityFinderCard from "../activity-finder/activity-finder-card";
+import { useAlertPreferences } from "@/app/hooks/useAlertPreferences";
 
 export const checkIfDay = (
   dt: number,
@@ -125,6 +130,12 @@ const WeatherDashboard = ({
 }) => {
   const [weatherData, setWeatherData] = useState<WeatherDataResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const { checkAlerts } = useAlertPreferences();
+
+  const triggeredAlerts = useMemo(() => {
+    if (!weatherData) return [];
+    return checkAlerts(weatherData, (units as UnitsType) ?? "metric");
+  }, [weatherData, units, checkAlerts]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -176,6 +187,7 @@ const WeatherDashboard = ({
       {!loading ? (
         weatherData ? (
           <div className="weather-data-container">
+            <AlertBanner triggeredAlerts={triggeredAlerts} currentUnits={units} />
             <CurrentCard weatherData={weatherData} units={measuringUnits} />
             <HourlyCard
               weatherData={weatherData}
@@ -183,6 +195,9 @@ const WeatherDashboard = ({
               graphHeight={graphHeight}
             />
             <DailyCard weatherData={weatherData} />
+            <RecommendationsCard weatherData={weatherData} units={(units as UnitsType) ?? "metric"} />
+            <ActivityFinderCard weatherData={weatherData} units={(units as UnitsType) ?? "metric"} />
+            <AlertSettingsCard locationName={weatherData.name} />
           </div>
         ) : (
           <div className="no-results-container">
