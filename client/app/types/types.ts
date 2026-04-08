@@ -67,3 +67,70 @@ export interface WeatherDataResponse {
   daily: DailyWeatherData[];
   list: AirQualityData[];
 }
+
+// Favorites
+export interface FavoriteLocation {
+  id: string;
+  city: string;
+  country: string;
+  addedAt: number;
+}
+
+// Alerts
+export type AlertMetric = "temp" | "wind" | "precipitation";
+export type AlertComparator = "above" | "below";
+
+export interface AlertPreference {
+  id: string;
+  metric: AlertMetric;
+  comparator: AlertComparator;
+  threshold: number;
+  units: UnitsType;
+  enabled: boolean;
+  location: string;
+}
+
+export interface TriggeredAlert {
+  alert: AlertPreference;
+  currentValue: number;
+  locationName: string;
+}
+
+// Recommendations
+export type ActivityCategory =
+  | "outdoor_exercise"
+  | "indoor_activity"
+  | "photography"
+  | "beach"
+  | "winter_sport"
+  | "casual_walk"
+  | "stay_home";
+
+export interface DailyRecommendation {
+  category: ActivityCategory;
+  title: string;
+  description: string;
+  confidence: number;
+}
+
+// Activity Finder
+export type OutdoorActivity =
+  | "running"
+  | "cycling"
+  | "hiking"
+  | "photography"
+  | "picnic"
+  | "stargazing";
+
+export interface HourlyActivityScore {
+  dt: number;
+  score: number;
+  reasons: string[];
+}
+
+export interface ActivityTimeFinder {
+  activity: OutdoorActivity;
+  bestHours: HourlyActivityScore[];
+  allHours: HourlyActivityScore[];
+  overallVerdict: string;
+}
