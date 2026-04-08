@@ -26,10 +26,10 @@ const Header = () => {
                 <TiWeatherPartlySunny />
               </span>
               <span className="text">
-                Weather<span className="colored">App</span>
+                WeCliFor<span className="colored">App</span>
               </span>
             </h1>
-            <p className="subtitle">Live climate dashboard</p>
+            <p className="subtitle">Personal Weather Assistant Dashboard</p>
           </div>
           <div className="right-side">
             <div className="favorites-trigger-wrapper">
