@@ -109,10 +109,6 @@ function scoreHour(
   let score = 100;
   const reasons: string[] = [];
   const tempC = toMetricTemp(hour.temp, units);
-  const windKmh = toKmh(
-    units === "imperial" ? hour.humidity : hour.temp, // wind_speed not in hourly, use pop/temp as proxy
-    units
-  );
   // HourlyWeatherData doesn't have wind_speed, so we estimate from current
   const estWindKmh = toKmh(current.wind_speed, units);
   const pop = hour.pop * 100;

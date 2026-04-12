@@ -1,8 +1,8 @@
 "use client";
 import React, { useMemo } from "react";
-import { IoSunny, IoRainy, IoSnow } from "react-icons/io5";
+import { IoSunny, IoSnow } from "react-icons/io5";
 import { BsCloudsFill } from "react-icons/bs";
-import { MdOutdoorGrill, MdSurfing } from "react-icons/md";
+import { MdSurfing } from "react-icons/md";
 import { FaRunning, FaHome, FaCamera } from "react-icons/fa";
 import { generateRecommendations } from "@/app/utils/recommendations";
 import {

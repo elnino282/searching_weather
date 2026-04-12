@@ -1,19 +1,23 @@
 "use client";
 import React, { useContext, useState } from "react";
-import { IoAdd, IoClose, IoTrash } from "react-icons/io5";
-import { MdNotificationsActive } from "react-icons/md";
+import { IoAdd, IoTrash } from "react-icons/io5";
+import { MdNotificationsActive, MdNotificationsOff } from "react-icons/md";
 import { useAlertPreferences } from "@/app/hooks/useAlertPreferences";
+import { useNotifications } from "@/app/hooks/useNotifications";
 import { UnitContext } from "@/app/context/unit-provider";
 import { AlertComparator, AlertMetric } from "@/app/types/types";
 
 const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
+  const { permissionStatus, fcmToken, requestNotificationPermission } =
+    useNotifications();
   const { alerts, addAlert, removeAlert, toggleAlert } =
-    useAlertPreferences();
+    useAlertPreferences(fcmToken);
   const { units } = useContext(UnitContext);
   const [showForm, setShowForm] = useState(false);
   const [metric, setMetric] = useState<AlertMetric>("temp");
   const [comparator, setComparator] = useState<AlertComparator>("above");
   const [threshold, setThreshold] = useState<string>("");
+  const [enablingPush, setEnablingPush] = useState(false);
 
   const handleSave = () => {
     const value = parseFloat(threshold);
@@ -28,6 +32,12 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
     });
     setThreshold("");
     setShowForm(false);
+  };
+
+  const handleEnablePush = async () => {
+    setEnablingPush(true);
+    await requestNotificationPermission();
+    setEnablingPush(false);
   };
 
   const metricLabel = (m: string) => {
@@ -52,6 +62,36 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
             <MdNotificationsActive /> Weather Alerts
           </h3>
         </div>
+      </div>
+
+      {/* Push Notification status banner */}
+      <div className="alert-push-status">
+        {permissionStatus === "granted" && fcmToken ? (
+          <div className="alert-push-badge alert-push-enabled">
+            <MdNotificationsActive />
+            <span>Push Notifications enabled</span>
+          </div>
+        ) : permissionStatus === "denied" ? (
+          <div className="alert-push-badge alert-push-denied">
+            <MdNotificationsOff />
+            <span>Notifications blocked — enable in browser settings</span>
+          </div>
+        ) : permissionStatus === "unsupported" ? (
+          <div className="alert-push-badge alert-push-denied">
+            <MdNotificationsOff />
+            <span>Push notifications not supported in this browser</span>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="alert-enable-push-btn"
+            onClick={handleEnablePush}
+            disabled={enablingPush}
+          >
+            <MdNotificationsActive />
+            {enablingPush ? "Enabling..." : "Enable Push Notifications"}
+          </button>
+        )}
       </div>
 
       {alerts.length > 0 && (

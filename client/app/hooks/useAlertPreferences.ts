@@ -8,6 +8,8 @@ import {
   WeatherDataResponse,
 } from "@/app/types/types";
 
+const BACKEND_URI = process.env.NEXT_PUBLIC_BACKEND_URI ?? "http://localhost:4000/api";
+
 function convertTemp(value: number, from: UnitsType, to: UnitsType): number {
   if (from === to) return value;
   if (from === "imperial") return (value - 32) * (5 / 9);
@@ -20,7 +22,21 @@ function convertWind(value: number, from: UnitsType, to: UnitsType): number {
   return value / 1.60934;
 }
 
-export function useAlertPreferences() {
+// Sync alerts to backend (fire-and-forget)
+async function syncAlertsToBackend(alerts: AlertPreference[], fcmToken: string | null) {
+  if (!fcmToken) return;
+  try {
+    await fetch(`${BACKEND_URI}/alerts/subscribe`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fcmToken, alerts }),
+    });
+  } catch (error) {
+    console.error("Failed to sync alerts to backend:", error);
+  }
+}
+
+export function useAlertPreferences(fcmToken?: string | null) {
   const [alerts, setAlerts] = useLocalStorage<AlertPreference[]>(
     "weather-app-alerts",
     []
@@ -28,37 +44,49 @@ export function useAlertPreferences() {
 
   const addAlert = useCallback(
     (alert: Omit<AlertPreference, "id">) => {
-      setAlerts((prev) => [
-        ...prev,
-        { ...alert, id: crypto.randomUUID() },
-      ]);
+      setAlerts((prev) => {
+        const updated = [
+          ...prev,
+          { ...alert, id: crypto.randomUUID() },
+        ];
+        syncAlertsToBackend(updated, fcmToken ?? null);
+        return updated;
+      });
     },
-    [setAlerts]
+    [setAlerts, fcmToken]
   );
 
   const updateAlert = useCallback(
     (id: string, updates: Partial<AlertPreference>) => {
-      setAlerts((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, ...updates } : a))
-      );
+      setAlerts((prev) => {
+        const updated = prev.map((a) => (a.id === id ? { ...a, ...updates } : a));
+        syncAlertsToBackend(updated, fcmToken ?? null);
+        return updated;
+      });
     },
-    [setAlerts]
+    [setAlerts, fcmToken]
   );
 
   const removeAlert = useCallback(
     (id: string) => {
-      setAlerts((prev) => prev.filter((a) => a.id !== id));
+      setAlerts((prev) => {
+        const updated = prev.filter((a) => a.id !== id);
+        syncAlertsToBackend(updated, fcmToken ?? null);
+        return updated;
+      });
     },
-    [setAlerts]
+    [setAlerts, fcmToken]
   );
 
   const toggleAlert = useCallback(
     (id: string) => {
-      setAlerts((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, enabled: !a.enabled } : a))
-      );
+      setAlerts((prev) => {
+        const updated = prev.map((a) => (a.id === id ? { ...a, enabled: !a.enabled } : a));
+        syncAlertsToBackend(updated, fcmToken ?? null);
+        return updated;
+      });
     },
-    [setAlerts]
+    [setAlerts, fcmToken]
   );
 
   const checkAlerts = useCallback(
