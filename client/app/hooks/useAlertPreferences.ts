@@ -1,5 +1,5 @@
 "use client";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useLocalStorage } from "./useLocalStorage";
 import {
   AlertPreference,
@@ -42,51 +42,48 @@ export function useAlertPreferences(fcmToken?: string | null) {
     []
   );
 
+  useEffect(() => {
+    if (!fcmToken) return;
+    syncAlertsToBackend(alerts, fcmToken);
+  }, [alerts, fcmToken]);
+
   const addAlert = useCallback(
     (alert: Omit<AlertPreference, "id">) => {
       setAlerts((prev) => {
-        const updated = [
+        return [
           ...prev,
           { ...alert, id: crypto.randomUUID() },
         ];
-        syncAlertsToBackend(updated, fcmToken ?? null);
-        return updated;
       });
     },
-    [setAlerts, fcmToken]
+    [setAlerts]
   );
 
   const updateAlert = useCallback(
     (id: string, updates: Partial<AlertPreference>) => {
       setAlerts((prev) => {
-        const updated = prev.map((a) => (a.id === id ? { ...a, ...updates } : a));
-        syncAlertsToBackend(updated, fcmToken ?? null);
-        return updated;
+        return prev.map((a) => (a.id === id ? { ...a, ...updates } : a));
       });
     },
-    [setAlerts, fcmToken]
+    [setAlerts]
   );
 
   const removeAlert = useCallback(
     (id: string) => {
       setAlerts((prev) => {
-        const updated = prev.filter((a) => a.id !== id);
-        syncAlertsToBackend(updated, fcmToken ?? null);
-        return updated;
+        return prev.filter((a) => a.id !== id);
       });
     },
-    [setAlerts, fcmToken]
+    [setAlerts]
   );
 
   const toggleAlert = useCallback(
     (id: string) => {
       setAlerts((prev) => {
-        const updated = prev.map((a) => (a.id === id ? { ...a, enabled: !a.enabled } : a));
-        syncAlertsToBackend(updated, fcmToken ?? null);
-        return updated;
+        return prev.map((a) => (a.id === id ? { ...a, enabled: !a.enabled } : a));
       });
     },
-    [setAlerts, fcmToken]
+    [setAlerts]
   );
 
   const checkAlerts = useCallback(
