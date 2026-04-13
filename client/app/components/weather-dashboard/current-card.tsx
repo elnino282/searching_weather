@@ -1,11 +1,11 @@
 "use client";
 import {
-  formatCamelCase,
   formatDate,
   formatTime,
   formatTimeDuration,
   getCurrentTime,
   removeAfterHyphen,
+  translateWeatherDescription,
 } from "@/app/utils/utility-functions";
 import React, { useContext, useEffect, useRef } from "react";
 import { ImLocation } from "react-icons/im";
@@ -90,7 +90,7 @@ const CurrentCard = ({
       >
         <div className="hero-overlay">
           <div className="info-container">
-            <p className="section-label">Current weather</p>
+            <p className="section-label">Thời tiết hiện tại</p>
             <p id="current-time">{getCurrentTime(weatherData?.timezone_offset)}</p>
             <p id="current-location">
               <ImLocation /> {weatherData?.name}, {weatherData?.country}
@@ -108,7 +108,7 @@ const CurrentCard = ({
               )}
             </div>
             <p id="weather-description">
-              {formatCamelCase(weatherData?.current.weather[0].description)}
+              {translateWeatherDescription(weatherData?.current.weather[0].description)}
             </p>
           </div>
           <div className="temp-container">
@@ -117,7 +117,7 @@ const CurrentCard = ({
               {tempUnit}
             </h2>
             <p id="feels-like">
-              Feels Like {Math.round(weatherData?.current.feels_like)}
+              Cảm giác như {Math.round(weatherData?.current.feels_like)}
               {tempUnit}
             </p>
           </div>
@@ -130,7 +130,7 @@ const CurrentCard = ({
             <GiWaterDrop />
           </p>
           <h4 className="info">{weatherData?.current.humidity}%</h4>
-          <p className="title">Humidity</p>
+          <p className="title">Độ ẩm</p>
         </div>
 
         <div className="metric-card visibility-container">
@@ -143,7 +143,7 @@ const CurrentCard = ({
             )}{" "}
             {distanceUnit}
           </h4>
-          <p className="title">Visibility</p>
+          <p className="title">Tầm nhìn</p>
         </div>
 
         <div className="metric-card sunrise-container">
@@ -156,7 +156,7 @@ const CurrentCard = ({
               weatherData?.timezone_offset
             )}
           </h4>
-          <p className="title">Sunrise</p>
+          <p className="title">Mặt trời mọc</p>
         </div>
 
         <div className="metric-card sunset-container">
@@ -166,7 +166,7 @@ const CurrentCard = ({
           <h4 className="info">
             {formatTime(weatherData?.current.sunset, weatherData?.timezone_offset)}
           </h4>
-          <p className="title">Sunset</p>
+          <p className="title">Mặt trời lặn</p>
         </div>
 
         <div className="metric-card day-length-container">
@@ -177,13 +177,13 @@ const CurrentCard = ({
           </h4>
           <p className="title">
             <TbSunMoon />
-            Day Length
+            Độ dài ban ngày
           </p>
         </div>
 
         <div className="metric-card wind-container">
           <p className="title">
-            <LuWind /> Wind Speed
+            <LuWind /> Tốc độ gió
           </p>
           <p className="info">
             {Math.round(weatherData?.current.wind_speed * speedMultiplier)} {speedUnit}
@@ -198,7 +198,7 @@ const CurrentCard = ({
           <div className="aqi-header">
             <p className="title">
               <MdAir />
-              Air Quality Index
+              Chỉ số chất lượng không khí
             </p>
             <p className="info aqi-score">{weatherData?.list[0].main.aqi}</p>
           </div>

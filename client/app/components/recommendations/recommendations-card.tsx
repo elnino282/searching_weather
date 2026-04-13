@@ -37,8 +37,8 @@ const RecommendationsCard = ({
     <section className="recommendations-card">
       <div className="section-header">
         <div>
-          <p className="section-label">Insights</p>
-          <h3>Today&apos;s Recommendations</h3>
+          <p className="section-label">Gợi ý</p>
+          <h3>Gợi ý cho hôm nay</h3>
         </div>
       </div>
       <div className="recommendation-grid">
@@ -58,7 +58,7 @@ const RecommendationsCard = ({
                     : "low"
               }`}
             >
-              {rec.confidence}% match
+              {rec.confidence}% phù hợp
             </div>
           </div>
         ))}

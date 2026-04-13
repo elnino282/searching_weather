@@ -29,9 +29,9 @@ messaging.onBackgroundMessage((payload) => {
   console.log("[firebase-messaging-sw.js] Background message received:", payload);
 
   const notificationTitle =
-    payload.notification?.title ?? "Weather Alert";
+    payload.notification?.title ?? "Cảnh báo thời tiết";
   const notificationOptions = {
-    body: payload.notification?.body ?? "You have a new weather alert.",
+    body: payload.notification?.body ?? "Bạn có một cảnh báo thời tiết mới.",
     icon: "/static/weather-icon.png",
     badge: "/static/weather-icon.png",
     tag: payload.data?.alertId ?? "weather-alert",

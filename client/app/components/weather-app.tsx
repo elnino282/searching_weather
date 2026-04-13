@@ -33,7 +33,7 @@ const WeatherApp = ({
                 type="button"
                 className="fcm-toast-close"
                 onClick={clearLatestMessage}
-                aria-label="Dismiss notification"
+                aria-label="Đóng thông báo"
               >
                 ×
               </button>

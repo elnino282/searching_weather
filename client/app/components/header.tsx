@@ -29,7 +29,7 @@ const Header = () => {
                 WeCliFor<span className="colored">App</span>
               </span>
             </h1>
-            <p className="subtitle">Personal Weather Assistant Dashboard</p>
+            <p className="subtitle">Bảng điều khiển trợ lý thời tiết cá nhân</p>
           </div>
           <div className="right-side">
             <div className="favorites-trigger-wrapper">
@@ -37,7 +37,7 @@ const Header = () => {
                 type="button"
                 className="favorites-trigger"
                 onClick={() => setShowFavorites((prev) => !prev)}
-                aria-label="Toggle favorites"
+                aria-label="Mở danh sách yêu thích"
               >
                 <IoStar />
                 {favorites.length > 0 && (

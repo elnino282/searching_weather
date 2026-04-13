@@ -19,8 +19,8 @@ const DailyCard = ({ weatherData }: { weatherData: WeatherDataResponse }) => {
     <section className="daily-forecast-container">
       <div className="section-header">
         <div>
-          <p className="section-label">Forecast</p>
-          <h3>8-Day Outlook</h3>
+          <p className="section-label">Dự báo</p>
+          <h3>8 ngày tới</h3>
         </div>
       </div>
 
@@ -28,7 +28,7 @@ const DailyCard = ({ weatherData }: { weatherData: WeatherDataResponse }) => {
         <button
           type="button"
           className="left-button"
-          aria-label="Scroll daily forecast left"
+          aria-label="Cuộn dự báo ngày sang trái"
           onClick={() => scrollCarousel("left")}
         >
           <FaChevronLeft />
@@ -38,7 +38,7 @@ const DailyCard = ({ weatherData }: { weatherData: WeatherDataResponse }) => {
         <button
           type="button"
           className="right-button"
-          aria-label="Scroll daily forecast right"
+          aria-label="Cuộn dự báo ngày sang phải"
           onClick={() => scrollCarousel("right")}
         >
           <FaChevronRight />
@@ -53,7 +53,7 @@ const DailyCard = ({ weatherData }: { weatherData: WeatherDataResponse }) => {
 
               return (
                 <li key={index}>
-                  <p className="day">{index === 0 ? "Today" : date}</p>
+                  <p className="day">{index === 0 ? "Hôm nay" : date}</p>
                   <div className="weather-icon" id="weather-icon-daily">
                     {selectWeatherIcon(
                       day.weather[0].main,

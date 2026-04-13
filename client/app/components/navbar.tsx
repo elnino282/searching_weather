@@ -30,7 +30,7 @@ const Navbar = () => {
             <TiWeatherPartlySunny />
           </span>
           <span className="text">
-            Weather<span className="colored">App</span>
+            WeCliFor<span className="colored">App</span>
           </span>
         </h1>
         <div className="right-side">
@@ -43,7 +43,7 @@ const Navbar = () => {
             className="nav-menu-button"
             aria-controls="mobile-side-nav"
             aria-expanded={showing}
-            aria-label="Open city search panel"
+            aria-label="Mở bảng tìm kiếm thành phố"
             onClick={() => setShowing((prev) => !prev)}
           >
             <IoMenu />
@@ -63,7 +63,7 @@ const Navbar = () => {
           {favorites.length > 0 && (
             <div className="mobile-favorites">
               <p className="mobile-favorites-title">
-                <IoStar /> Favorites
+                <IoStar /> Yêu thích
               </p>
               <ul className="mobile-favorites-list">
                 {favorites.map((fav) => (
@@ -82,7 +82,7 @@ const Navbar = () => {
                       type="button"
                       className="favorite-remove"
                       onClick={() => removeFavorite(fav.id)}
-                      aria-label={`Remove ${fav.city}`}
+                      aria-label={`Xóa ${fav.city} khỏi yêu thích`}
                     >
                       <IoClose />
                     </button>

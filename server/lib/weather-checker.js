@@ -85,13 +85,14 @@ function evaluateAlert(alert, weatherData) {
   const units = "metric"; // We always fetch in metric
   let currentValue;
   let threshold = alert.threshold;
-  let metricLabel, unitLabel;
+  let metricLabel;
+  let unitLabel;
 
   switch (alert.metric) {
     case "temp":
       currentValue = weatherData.current.temp;
       threshold = convertTemp(alert.threshold, alert.units, units);
-      metricLabel = "Temperature";
+      metricLabel = "Nhiệt độ";
       unitLabel = "°C";
       break;
     case "wind":
@@ -101,12 +102,12 @@ function evaluateAlert(alert, weatherData) {
         alert.units !== units
           ? convertWind(alert.threshold, alert.units, units)
           : alert.threshold;
-      metricLabel = "Wind speed";
+      metricLabel = "Tốc độ gió";
       unitLabel = "km/h";
       break;
     case "precipitation":
       currentValue = Math.round((weatherData.hourly?.[0]?.pop ?? 0) * 100);
-      metricLabel = "Precipitation chance";
+      metricLabel = "Khả năng mưa";
       unitLabel = "%";
       break;
     default:
@@ -120,9 +121,11 @@ function evaluateAlert(alert, weatherData) {
 
   if (!isTriggered) return null;
 
+  const comparatorLabel = alert.comparator === "above" ? "cao hơn" : "thấp hơn";
+
   return {
-    title: `⚠️ Weather Alert: ${weatherData.name}`,
-    body: `${metricLabel} is ${Math.round(currentValue)}${unitLabel} (${alert.comparator} ${Math.round(threshold)}${unitLabel})`,
+    title: `Cảnh báo thời tiết: ${weatherData.name}`,
+    body: `${metricLabel} là ${Math.round(currentValue)}${unitLabel} (${comparatorLabel} ${Math.round(threshold)}${unitLabel})`,
     alertId: alert.id,
     location: weatherData.name,
   };
@@ -160,7 +163,7 @@ async function checkAllSubscriptions() {
           if (alert.enabled && alert.location) {
             if (alert.location === "*") {
               // For wildcard alerts, we'd need to know which cities to check.
-              // Skip for now — they only trigger when the user views a city.
+              // Skip for now - they only trigger when the user views a city.
             } else {
               locationSet.add(alert.location.toLowerCase());
             }
@@ -257,7 +260,7 @@ async function checkAllSubscriptions() {
       }
     }
 
-    console.log(`[WeatherChecker] Alert check completed.`);
+    console.log("[WeatherChecker] Alert check completed.");
   } catch (error) {
     console.error("[WeatherChecker] Error during alert check:", error);
   }
@@ -277,7 +280,7 @@ function startWeatherChecker() {
   const cronExpression = `*/${intervalMinutes} * * * *`;
 
   console.log(
-    `[WeatherChecker] Starting cron job — checking every ${intervalMinutes} minutes (${cronExpression})`
+    `[WeatherChecker] Starting cron job - checking every ${intervalMinutes} minutes (${cronExpression})`
   );
 
   cron.schedule(cronExpression, () => {

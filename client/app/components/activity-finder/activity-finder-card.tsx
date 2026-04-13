@@ -16,12 +16,12 @@ const activities: {
   label: string;
   icon: React.ReactNode;
 }[] = [
-  { id: "running", label: "Running", icon: <FaRunning /> },
-  { id: "cycling", label: "Cycling", icon: <FaBiking /> },
-  { id: "hiking", label: "Hiking", icon: <FaHiking /> },
-  { id: "photography", label: "Photo", icon: <FaCamera /> },
-  { id: "picnic", label: "Picnic", icon: <MdOutdoorGrill /> },
-  { id: "stargazing", label: "Stargazing", icon: <IoMoonSharp /> },
+  { id: "running", label: "Chạy bộ", icon: <FaRunning /> },
+  { id: "cycling", label: "Đạp xe", icon: <FaBiking /> },
+  { id: "hiking", label: "Leo núi", icon: <FaHiking /> },
+  { id: "photography", label: "Chụp ảnh", icon: <FaCamera /> },
+  { id: "picnic", label: "Dã ngoại", icon: <MdOutdoorGrill /> },
+  { id: "stargazing", label: "Ngắm sao", icon: <IoMoonSharp /> },
 ];
 
 function getScoreColor(score: number): string {
@@ -56,8 +56,8 @@ const ActivityFinderCard = ({
     <section className="activity-finder-card">
       <div className="section-header">
         <div>
-          <p className="section-label">Planner</p>
-          <h3>Best Times for Activities</h3>
+          <p className="section-label">Lập kế hoạch</p>
+          <h3>Khung giờ phù hợp cho hoạt động</h3>
         </div>
       </div>
 
@@ -111,7 +111,7 @@ const ActivityFinderCard = ({
         ))}
       </div>
       <div className="heatmap-labels">
-        <span>Now</span>
+        <span>Bây giờ</span>
         <span>+12h</span>
         <span>+24h</span>
       </div>

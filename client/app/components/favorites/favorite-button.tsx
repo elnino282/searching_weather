@@ -29,7 +29,7 @@ const FavoriteButton = ({
     <button
       type="button"
       className="favorite-button"
-      aria-label={favorited ? "Remove from favorites" : "Add to favorites"}
+      aria-label={favorited ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
       onClick={handleClick}
     >
       {favorited ? <IoStar /> : <IoStarOutline />}

@@ -30,21 +30,21 @@ const FavoritesPanel = ({
     <div className="favorites-panel">
       <div className="favorites-panel-header">
         <h4>
-          <IoStar /> Favorites
+          <IoStar /> Yêu thích
         </h4>
         <button
           type="button"
           className="favorites-close-button"
           onClick={onClose}
-          aria-label="Close favorites"
+          aria-label="Đóng danh sách yêu thích"
         >
           <IoClose />
         </button>
       </div>
       {favorites.length === 0 ? (
         <p className="favorites-empty">
-          No favorite locations yet. Click the star icon next to a city name to
-          save it.
+          Chưa có địa điểm yêu thích. Nhấn biểu tượng ngôi sao cạnh tên thành
+          phố để lưu.
         </p>
       ) : (
         <ul className="favorites-list">
@@ -64,7 +64,7 @@ const FavoritesPanel = ({
                 type="button"
                 className="favorite-remove"
                 onClick={() => removeFavorite(fav.id)}
-                aria-label={`Remove ${fav.city}`}
+                aria-label={`Xóa ${fav.city} khỏi yêu thích`}
               >
                 <IoClose />
               </button>

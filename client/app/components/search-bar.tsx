@@ -128,8 +128,8 @@ const SearchBar = ({
           type="search"
           value={search}
           name="search"
-          placeholder="Search city..."
-          aria-label="Search city"
+          placeholder="Tìm thành phố..."
+          aria-label="Tìm thành phố"
           onChange={(e) => handleChange(e.target.value)}
           size={17}
           autoComplete="off"
@@ -143,7 +143,7 @@ const SearchBar = ({
         <button
           type="submit"
           className="search-button"
-          aria-label="Search weather by city"
+          aria-label="Tìm thời tiết theo thành phố"
           onClick={() => {
             handleSubmit(search);
           }}

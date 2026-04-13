@@ -35,8 +35,8 @@ const HourlyCard = ({
     <section className="hourly-forecast-container">
       <div className="section-header">
         <div>
-          <p className="section-label">Forecast</p>
-          <h3>Next 24 Hours</h3>
+          <p className="section-label">Dự báo</p>
+          <h3>24 giờ tới</h3>
         </div>
       </div>
 
@@ -44,7 +44,7 @@ const HourlyCard = ({
         <button
           type="button"
           className="left-button"
-          aria-label="Scroll hourly forecast left"
+          aria-label="Cuộn dự báo giờ sang trái"
           onClick={() => scrollCarousel("left")}
         >
           <FaChevronLeft />
@@ -54,7 +54,7 @@ const HourlyCard = ({
         <button
           type="button"
           className="right-button"
-          aria-label="Scroll hourly forecast right"
+          aria-label="Cuộn dự báo giờ sang phải"
           onClick={() => scrollCarousel("right")}
         >
           <FaChevronRight />

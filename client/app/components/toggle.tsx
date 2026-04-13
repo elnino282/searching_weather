@@ -49,7 +49,7 @@ const Toggle = ({
       type="button"
       className={`toggle-container ${units}`}
       onClick={toggleOption}
-      aria-label={`Switch temperature unit. Current unit ${selectedOption.name}.`}
+      aria-label={`Chuyển đơn vị nhiệt độ. Đơn vị hiện tại ${selectedOption.name}.`}
     >
       <span className="toggle-option option-left">{option1.name}</span>
       <span className="toggle-option option-right">{option2.name}</span>

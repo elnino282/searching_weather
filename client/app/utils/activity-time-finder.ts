@@ -109,7 +109,7 @@ function scoreHour(
   let score = 100;
   const reasons: string[] = [];
   const tempC = toMetricTemp(hour.temp, units);
-  // HourlyWeatherData doesn't have wind_speed, so we estimate from current
+  // HourlyWeatherData doesn't have wind_speed, so we estimate from current.
   const estWindKmh = toKmh(current.wind_speed, units);
   const pop = hour.pop * 100;
   const condition = hour.weather[0]?.main?.toLowerCase() || "clear";
@@ -120,56 +120,56 @@ function scoreHour(
   if (tempC < profile.idealTempMinC) {
     const diff = profile.idealTempMinC - tempC;
     score -= diff * 3;
-    if (diff > 5) reasons.push("Too cold");
+    if (diff > 5) reasons.push("Quá lạnh");
   } else if (tempC > profile.idealTempMaxC) {
     const diff = tempC - profile.idealTempMaxC;
     score -= diff * 3;
-    if (diff > 5) reasons.push("Too hot");
+    if (diff > 5) reasons.push("Quá nóng");
   } else {
-    reasons.push("Good temperature");
+    reasons.push("Nhiệt độ phù hợp");
   }
 
   // Precipitation scoring
   if (pop > profile.maxPop) {
     score -= (pop - profile.maxPop) * 0.8;
-    reasons.push(`${Math.round(pop)}% rain chance`);
+    reasons.push(`${Math.round(pop)}% khả năng mưa`);
   }
 
   // Wind scoring (estimated)
   if (estWindKmh > profile.maxWindKmh) {
     score -= (estWindKmh - profile.maxWindKmh) * 1.5;
-    reasons.push("Windy");
+    reasons.push("Gió mạnh");
   }
 
   // Weather condition scoring
   if (profile.clearOnly && !["clear", "clouds"].includes(condition)) {
     score -= 30;
-    reasons.push("Poor weather");
+    reasons.push("Thời tiết không thuận lợi");
   }
 
   if (["thunderstorm", "snow"].includes(condition)) {
     score -= 40;
-    reasons.push("Severe weather");
+    reasons.push("Thời tiết xấu");
   }
 
   // Time preference scoring
   if (profile.preferDaylight && !isDaytime) {
     score -= 25;
-    reasons.push("After dark");
+    reasons.push("Đã tối");
   }
 
   if (profile.preferGoldenHour && goldenHour) {
     score += 15;
-    reasons.push("Golden hour");
+    reasons.push("Giờ vàng");
   }
 
   if (profile.preferNight) {
     if (isDaytime) {
       score -= 30;
-      reasons.push("Too bright");
+      reasons.push("Quá sáng");
     } else {
       score += 10;
-      reasons.push("Dark skies");
+      reasons.push("Trời tối");
     }
   }
 
@@ -198,13 +198,13 @@ export function findBestTimes(
   const bestScore = bestHours[0]?.score ?? 0;
   let overallVerdict: string;
   if (bestScore >= 80) {
-    overallVerdict = "Excellent conditions today — great time to go!";
+    overallVerdict = "Điều kiện hôm nay rất tốt, nên đi ngay!";
   } else if (bestScore >= 60) {
-    overallVerdict = "Decent conditions — a few good windows available.";
+    overallVerdict = "Điều kiện khá ổn, có vài khung giờ phù hợp.";
   } else if (bestScore >= 40) {
-    overallVerdict = "Marginal conditions — proceed with caution.";
+    overallVerdict = "Điều kiện trung bình, nên cân nhắc kỹ.";
   } else {
-    overallVerdict = "Poor conditions today — consider postponing.";
+    overallVerdict = "Điều kiện hôm nay kém, nên dời lịch.";
   }
 
   return { activity, bestHours, allHours, overallVerdict };

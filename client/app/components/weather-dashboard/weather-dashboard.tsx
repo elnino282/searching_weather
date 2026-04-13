@@ -166,7 +166,7 @@ const WeatherDashboard = ({
         tempUnit: "\u00B0F",
         distanceMultiplier: 0.6213, // Converts kilometers to miles.
         speedMultiplier: 1, // Imperial already returns mph.
-        distanceUnit: "miles",
+        distanceUnit: "dặm",
       };
     }
 
@@ -201,8 +201,8 @@ const WeatherDashboard = ({
           </div>
         ) : (
           <div className="no-results-container">
-            <h2>No results found</h2>
-            <p>Try another city name.</p>
+            <h2>Không tìm thấy kết quả</h2>
+            <p>Hãy thử tên thành phố khác.</p>
           </div>
         )
       ) : (
