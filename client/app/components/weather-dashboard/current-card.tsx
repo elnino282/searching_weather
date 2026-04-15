@@ -45,6 +45,13 @@ const CurrentCard = ({
   const { period, setPeriod } = useContext(PeriodContext);
   const dayRef = useRef<PeriodType>(period);
   const { language } = useLanguage();
+  const hasValidImageUrl =
+    typeof weatherData.imageUrl === "string" &&
+    weatherData.imageUrl.trim() !== "" &&
+    weatherData.imageUrl !== "null";
+  const heroBackgroundImage = hasValidImageUrl
+    ? `linear-gradient(135deg, var(--background-color-1), var(--background-color-2)), url(${weatherData.imageUrl})`
+    : "linear-gradient(135deg, var(--background-color-1), var(--background-color-2))";
 
   useEffect(() => {
     const newPeriod = checkIfDay(
@@ -87,7 +94,7 @@ const CurrentCard = ({
       <article
         className="main-container"
         style={{
-          backgroundImage: `linear-gradient(135deg, var(--background-color-1), var(--background-color-2)), url(${weatherData.imageUrl})`,
+          backgroundImage: heroBackgroundImage,
         }}
       >
         <div className="hero-overlay">

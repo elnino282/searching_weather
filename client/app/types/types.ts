@@ -59,7 +59,7 @@ export interface AirQualityData {
 }
 
 export interface WeatherDataResponse {
-  imageUrl: string;
+  imageUrl: string | null;
   timezone_offset: number;
   name: string;
   country: string;
