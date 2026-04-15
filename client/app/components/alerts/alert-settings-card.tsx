@@ -6,6 +6,7 @@ import { useAlertPreferences } from "@/app/hooks/useAlertPreferences";
 import { useNotifications } from "@/app/hooks/useNotifications";
 import { UnitContext } from "@/app/context/unit-provider";
 import { AlertComparator, AlertMetric } from "@/app/types/types";
+import { useLanguage } from "@/app/context/language-provider";
 
 const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
   const {
@@ -18,11 +19,71 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
   } = useNotifications();
   const { alerts, addAlert, removeAlert, toggleAlert } = useAlertPreferences(fcmToken);
   const { units } = useContext(UnitContext);
+  const { language } = useLanguage();
   const [showForm, setShowForm] = useState(false);
   const [metric, setMetric] = useState<AlertMetric>("temp");
   const [comparator, setComparator] = useState<AlertComparator>("above");
   const [threshold, setThreshold] = useState<string>("");
   const [enablingPush, setEnablingPush] = useState(false);
+
+  const copy =
+    language === "vi"
+      ? {
+          sectionLabel: "Cài đặt",
+          sectionTitle: "Cảnh báo thời tiết",
+          pushEnabled: "Đã bật thông báo đẩy",
+          pushDisabled: "Thông báo đẩy đang tắt",
+          disableLoading: "Đang tắt...",
+          disablePush: "Tắt thông báo đẩy",
+          enableLoading: "Đang bật...",
+          enablePush: "Bật thông báo đẩy",
+          blocked: "Thông báo đã bị chặn. Hãy bật lại trong cài đặt trình duyệt.",
+          unsupported: "Trình duyệt này không hỗ trợ thông báo đẩy",
+          allLocations: "Mọi địa điểm",
+          turnOffAlert: "Tắt cảnh báo",
+          turnOnAlert: "Bật cảnh báo",
+          deleteAlert: "Xóa cảnh báo",
+          greaterThan: "Lớn hơn",
+          lessThan: "Nhỏ hơn",
+          threshold: "Ngưỡng",
+          save: "Lưu",
+          cancel: "Hủy",
+          addAlert: "Thêm cảnh báo",
+          temperature: "Nhiệt độ",
+          windSpeed: "Tốc độ gió",
+          rainChance: "Khả năng mưa",
+          windLabel: "Gió",
+          aboveLabel: "cao hơn",
+          belowLabel: "thấp hơn",
+        }
+      : {
+          sectionLabel: "Settings",
+          sectionTitle: "Weather alerts",
+          pushEnabled: "Push notifications are enabled",
+          pushDisabled: "Push notifications are disabled",
+          disableLoading: "Disabling...",
+          disablePush: "Disable push notifications",
+          enableLoading: "Enabling...",
+          enablePush: "Enable push notifications",
+          blocked: "Notifications are blocked. Please enable them in browser settings.",
+          unsupported: "This browser does not support push notifications",
+          allLocations: "All locations",
+          turnOffAlert: "Disable alert",
+          turnOnAlert: "Enable alert",
+          deleteAlert: "Delete alert",
+          greaterThan: "Greater than",
+          lessThan: "Less than",
+          threshold: "Threshold",
+          save: "Save",
+          cancel: "Cancel",
+          addAlert: "Add alert",
+          temperature: "Temperature",
+          windSpeed: "Wind speed",
+          rainChance: "Rain chance",
+          windLabel: "Wind",
+          aboveLabel: "above",
+          belowLabel: "below",
+        };
 
   const notificationsActive =
     permissionStatus === "granted" && pushEnabled && Boolean(fcmToken);
@@ -57,26 +118,26 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
   const metricLabel = (m: AlertMetric) => {
     switch (m) {
       case "temp":
-        return `Nhiệt độ (${units === "metric" ? "\u00B0C" : "\u00B0F"})`;
+        return `${copy.temperature} (${units === "metric" ? "\u00B0C" : "\u00B0F"})`;
       case "wind":
-        return `Gió (${units === "metric" ? "km/h" : "mph"})`;
+        return `${copy.windLabel} (${units === "metric" ? "km/h" : "mph"})`;
       case "precipitation":
-        return "Khả năng mưa (%)";
+        return `${copy.rainChance} (%)`;
       default:
         return m;
     }
   };
 
   const comparatorLabel = (value: AlertComparator) =>
-    value === "above" ? "cao hơn" : "thấp hơn";
+    value === "above" ? copy.aboveLabel : copy.belowLabel;
 
   return (
     <section className="alert-settings-card">
       <div className="section-header">
         <div>
-          <p className="section-label">Cài đặt</p>
+          <p className="section-label">{copy.sectionLabel}</p>
           <h3>
-            <MdNotificationsActive /> Cảnh báo thời tiết
+            <MdNotificationsActive /> {copy.sectionTitle}
           </h3>
         </div>
       </div>
@@ -87,12 +148,12 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
             {notificationsActive ? (
               <div className="alert-push-badge alert-push-enabled">
                 <MdNotificationsActive />
-                <span>Đã bật thông báo đẩy</span>
+                <span>{copy.pushEnabled}</span>
               </div>
             ) : (
               <div className="alert-push-badge alert-push-denied">
                 <MdNotificationsOff />
-                <span>Thông báo đẩy đang tắt</span>
+                <span>{copy.pushDisabled}</span>
               </div>
             )}
 
@@ -104,7 +165,7 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
                 disabled={isTogglingPush}
               >
                 <MdNotificationsOff />
-                {isTogglingPush ? "Đang tắt..." : "Tắt thông báo đẩy"}
+                {isTogglingPush ? copy.disableLoading : copy.disablePush}
               </button>
             ) : (
               <button
@@ -114,19 +175,19 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
                 disabled={enablingPush}
               >
                 <MdNotificationsActive />
-                {enablingPush ? "Đang bật..." : "Bật thông báo đẩy"}
+                {enablingPush ? copy.enableLoading : copy.enablePush}
               </button>
             )}
           </>
         ) : permissionStatus === "denied" ? (
           <div className="alert-push-badge alert-push-denied">
             <MdNotificationsOff />
-            <span>Thông báo đã bị chặn. Hãy bật lại trong cài đặt trình duyệt.</span>
+            <span>{copy.blocked}</span>
           </div>
         ) : permissionStatus === "unsupported" ? (
           <div className="alert-push-badge alert-push-denied">
             <MdNotificationsOff />
-            <span>Trình duyệt này không hỗ trợ thông báo đẩy</span>
+            <span>{copy.unsupported}</span>
           </div>
         ) : (
           <button
@@ -136,7 +197,7 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
             disabled={enablingPush}
           >
             <MdNotificationsActive />
-            {enablingPush ? "Đang bật..." : "Bật thông báo đẩy"}
+            {enablingPush ? copy.enableLoading : copy.enablePush}
           </button>
         )}
       </div>
@@ -147,10 +208,11 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
             <li key={alert.id} className="alert-item">
               <div className="alert-item-info">
                 <p>
-                  {metricLabel(alert.metric)} {comparatorLabel(alert.comparator)} {alert.threshold}
+                  {metricLabel(alert.metric)} {comparatorLabel(alert.comparator)}{" "}
+                  {alert.threshold}
                 </p>
                 <span className="alert-item-location">
-                  {alert.location === "*" ? "Mọi địa điểm" : alert.location}
+                  {alert.location === "*" ? copy.allLocations : alert.location}
                 </span>
               </div>
               <div className="alert-item-actions">
@@ -158,7 +220,7 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
                   type="button"
                   className={`alert-toggle ${alert.enabled ? "enabled" : ""}`}
                   onClick={() => toggleAlert(alert.id)}
-                  aria-label={alert.enabled ? "Tắt cảnh báo" : "Bật cảnh báo"}
+                  aria-label={alert.enabled ? copy.turnOffAlert : copy.turnOnAlert}
                 >
                   <span className="alert-toggle-knob" />
                 </button>
@@ -166,7 +228,7 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
                   type="button"
                   className="alert-delete"
                   onClick={() => removeAlert(alert.id)}
-                  aria-label="Xóa cảnh báo"
+                  aria-label={copy.deleteAlert}
                 >
                   <IoTrash />
                 </button>
@@ -184,36 +246,36 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
               onChange={(e) => setMetric(e.target.value as AlertMetric)}
               className="alert-select"
             >
-              <option value="temp">Nhiệt độ</option>
-              <option value="wind">Tốc độ gió</option>
-              <option value="precipitation">Khả năng mưa</option>
+              <option value="temp">{copy.temperature}</option>
+              <option value="wind">{copy.windSpeed}</option>
+              <option value="precipitation">{copy.rainChance}</option>
             </select>
             <select
               value={comparator}
               onChange={(e) => setComparator(e.target.value as AlertComparator)}
               className="alert-select"
             >
-              <option value="above">Lớn hơn</option>
-              <option value="below">Nhỏ hơn</option>
+              <option value="above">{copy.greaterThan}</option>
+              <option value="below">{copy.lessThan}</option>
             </select>
             <input
               type="number"
               value={threshold}
               onChange={(e) => setThreshold(e.target.value)}
-              placeholder="Ngưỡng"
+              placeholder={copy.threshold}
               className="alert-input"
             />
           </div>
           <div className="alert-form-actions">
             <button type="button" className="alert-save" onClick={handleSave}>
-              Lưu
+              {copy.save}
             </button>
             <button
               type="button"
               className="alert-cancel"
               onClick={() => setShowForm(false)}
             >
-              Hủy
+              {copy.cancel}
             </button>
           </div>
         </div>
@@ -223,7 +285,7 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
           className="alert-add-button"
           onClick={() => setShowForm(true)}
         >
-          <IoAdd /> Thêm cảnh báo
+          <IoAdd /> {copy.addAlert}
         </button>
       )}
     </section>

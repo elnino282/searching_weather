@@ -19,6 +19,7 @@ import { WeatherContext } from "@/app/context/weather-provider";
 import { PeriodContext } from "@/app/context/period-provider";
 import { PeriodType, WeatherDataResponse, WeatherType } from "@/app/types/types";
 import FavoriteButton from "../favorites/favorite-button";
+import { useLanguage } from "@/app/context/language-provider";
 
 const CurrentCard = ({
   weatherData,
@@ -43,6 +44,7 @@ const CurrentCard = ({
   const { setWeather } = useContext(WeatherContext);
   const { period, setPeriod } = useContext(PeriodContext);
   const dayRef = useRef<PeriodType>(period);
+  const { language } = useLanguage();
 
   useEffect(() => {
     const newPeriod = checkIfDay(
@@ -90,13 +92,15 @@ const CurrentCard = ({
       >
         <div className="hero-overlay">
           <div className="info-container">
-            <p className="section-label">Thời tiết hiện tại</p>
+            <p className="section-label">
+              {language === "vi" ? "Thời tiết hiện tại" : "Current weather"}
+            </p>
             <p id="current-time">{getCurrentTime(weatherData?.timezone_offset)}</p>
             <p id="current-location">
               <ImLocation /> {weatherData?.name}, {weatherData?.country}
               <FavoriteButton city={weatherData?.name} country={weatherData?.country} />
             </p>
-            <p id="current-date">{formatDate(weatherData?.current.dt)}</p>
+            <p id="current-date">{formatDate(weatherData?.current.dt, language)}</p>
           </div>
           <div className="weather-container">
             <div className="weather-icon" id="weather-icon-current">
@@ -108,7 +112,10 @@ const CurrentCard = ({
               )}
             </div>
             <p id="weather-description">
-              {translateWeatherDescription(weatherData?.current.weather[0].description)}
+              {translateWeatherDescription(
+                weatherData?.current.weather[0].description,
+                language
+              )}
             </p>
           </div>
           <div className="temp-container">
@@ -117,7 +124,8 @@ const CurrentCard = ({
               {tempUnit}
             </h2>
             <p id="feels-like">
-              Cảm giác như {Math.round(weatherData?.current.feels_like)}
+              {language === "vi" ? "Cảm giác như" : "Feels like"}{" "}
+              {Math.round(weatherData?.current.feels_like)}
               {tempUnit}
             </p>
           </div>
@@ -130,7 +138,7 @@ const CurrentCard = ({
             <GiWaterDrop />
           </p>
           <h4 className="info">{weatherData?.current.humidity}%</h4>
-          <p className="title">Độ ẩm</p>
+          <p className="title">{language === "vi" ? "Độ ẩm" : "Humidity"}</p>
         </div>
 
         <div className="metric-card visibility-container">
@@ -143,7 +151,7 @@ const CurrentCard = ({
             )}{" "}
             {distanceUnit}
           </h4>
-          <p className="title">Tầm nhìn</p>
+          <p className="title">{language === "vi" ? "Tầm nhìn" : "Visibility"}</p>
         </div>
 
         <div className="metric-card sunrise-container">
@@ -156,7 +164,7 @@ const CurrentCard = ({
               weatherData?.timezone_offset
             )}
           </h4>
-          <p className="title">Mặt trời mọc</p>
+          <p className="title">{language === "vi" ? "Mặt trời mọc" : "Sunrise"}</p>
         </div>
 
         <div className="metric-card sunset-container">
@@ -166,24 +174,25 @@ const CurrentCard = ({
           <h4 className="info">
             {formatTime(weatherData?.current.sunset, weatherData?.timezone_offset)}
           </h4>
-          <p className="title">Mặt trời lặn</p>
+          <p className="title">{language === "vi" ? "Mặt trời lặn" : "Sunset"}</p>
         </div>
 
         <div className="metric-card day-length-container">
           <h4 className="info">
             {formatTimeDuration(
-              weatherData?.current.sunset - weatherData?.current.sunrise
+              weatherData?.current.sunset - weatherData?.current.sunrise,
+              language
             )}
           </h4>
           <p className="title">
             <TbSunMoon />
-            Độ dài ban ngày
+            {language === "vi" ? "Độ dài ban ngày" : "Day length"}
           </p>
         </div>
 
         <div className="metric-card wind-container">
           <p className="title">
-            <LuWind /> Tốc độ gió
+            <LuWind /> {language === "vi" ? "Tốc độ gió" : "Wind speed"}
           </p>
           <p className="info">
             {Math.round(weatherData?.current.wind_speed * speedMultiplier)} {speedUnit}
@@ -198,7 +207,7 @@ const CurrentCard = ({
           <div className="aqi-header">
             <p className="title">
               <MdAir />
-              Chỉ số chất lượng không khí
+              {language === "vi" ? "Chỉ số chất lượng không khí" : "Air quality index"}
             </p>
             <p className="info aqi-score">{weatherData?.list[0].main.aqi}</p>
           </div>

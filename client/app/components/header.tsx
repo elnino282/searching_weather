@@ -8,11 +8,14 @@ import { TiWeatherPartlySunny } from "react-icons/ti";
 import { IoStar } from "react-icons/io5";
 import { useFavorites } from "@/app/hooks/useFavorites";
 import FavoritesPanel from "./favorites/favorites-panel";
+import LanguageToggle from "./language-toggle";
+import { useLanguage } from "@/app/context/language-provider";
 
 const Header = () => {
   const device = useMediaQueries();
   const [showFavorites, setShowFavorites] = useState(false);
   const { favorites } = useFavorites();
+  const { language } = useLanguage();
 
   if (device < 4) {
     return <Navbar />;
@@ -29,7 +32,11 @@ const Header = () => {
                 WeCliFor<span className="colored">App</span>
               </span>
             </h1>
-            <p className="subtitle">Bảng điều khiển trợ lý thời tiết cá nhân</p>
+            <p className="subtitle">
+              {language === "vi"
+                ? "Bảng điều khiển trợ lý thời tiết cá nhân"
+                : "Personal weather assistant dashboard"}
+            </p>
           </div>
           <div className="right-side">
             <div className="favorites-trigger-wrapper">
@@ -37,7 +44,11 @@ const Header = () => {
                 type="button"
                 className="favorites-trigger"
                 onClick={() => setShowFavorites((prev) => !prev)}
-                aria-label="Mở danh sách yêu thích"
+                aria-label={
+                  language === "vi"
+                    ? "Mở danh sách yêu thích"
+                    : "Open favorites list"
+                }
               >
                 <IoStar />
                 {favorites.length > 0 && (
@@ -53,6 +64,7 @@ const Header = () => {
               option1={{ name: "C", value: "metric" }}
               option2={{ name: "F", value: "imperial" }}
             />
+            <LanguageToggle />
             <SearchBar />
           </div>
         </header>

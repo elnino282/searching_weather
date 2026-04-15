@@ -24,6 +24,7 @@ import AlertSettingsCard from "../alerts/alert-settings-card";
 import RecommendationsCard from "../recommendations/recommendations-card";
 import ActivityFinderCard from "../activity-finder/activity-finder-card";
 import { useAlertPreferences } from "@/app/hooks/useAlertPreferences";
+import { useLanguage } from "@/app/context/language-provider";
 
 export const checkIfDay = (
   dt: number,
@@ -131,6 +132,7 @@ const WeatherDashboard = ({
   const [weatherData, setWeatherData] = useState<WeatherDataResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const { checkAlerts } = useAlertPreferences();
+  const { language } = useLanguage();
 
   const triggeredAlerts = useMemo(() => {
     if (!weatherData) return [];
@@ -166,7 +168,7 @@ const WeatherDashboard = ({
         tempUnit: "\u00B0F",
         distanceMultiplier: 0.6213, // Converts kilometers to miles.
         speedMultiplier: 1, // Imperial already returns mph.
-        distanceUnit: "dặm",
+        distanceUnit: language === "vi" ? "dặm" : "mi",
       };
     }
 
@@ -177,7 +179,7 @@ const WeatherDashboard = ({
       distanceMultiplier: 1,
       speedMultiplier: 3.6, // Metric returns m/s, convert to km/h.
     };
-  }, [units]);
+  }, [language, units]);
 
   return (
     <section
@@ -201,8 +203,14 @@ const WeatherDashboard = ({
           </div>
         ) : (
           <div className="no-results-container">
-            <h2>Không tìm thấy kết quả</h2>
-            <p>Hãy thử tên thành phố khác.</p>
+            <h2>
+              {language === "vi" ? "Không tìm thấy kết quả" : "No results found"}
+            </h2>
+            <p>
+              {language === "vi"
+                ? "Hãy thử tên thành phố khác."
+                : "Try searching for a different city."}
+            </p>
           </div>
         )
       ) : (

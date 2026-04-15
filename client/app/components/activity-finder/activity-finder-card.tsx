@@ -10,18 +10,18 @@ import {
   UnitsType,
   WeatherDataResponse,
 } from "@/app/types/types";
+import { useLanguage } from "@/app/context/language-provider";
 
 const activities: {
   id: OutdoorActivity;
-  label: string;
   icon: React.ReactNode;
 }[] = [
-  { id: "running", label: "Chạy bộ", icon: <FaRunning /> },
-  { id: "cycling", label: "Đạp xe", icon: <FaBiking /> },
-  { id: "hiking", label: "Leo núi", icon: <FaHiking /> },
-  { id: "photography", label: "Chụp ảnh", icon: <FaCamera /> },
-  { id: "picnic", label: "Dã ngoại", icon: <MdOutdoorGrill /> },
-  { id: "stargazing", label: "Ngắm sao", icon: <IoMoonSharp /> },
+  { id: "running", icon: <FaRunning /> },
+  { id: "cycling", icon: <FaBiking /> },
+  { id: "hiking", icon: <FaHiking /> },
+  { id: "photography", icon: <FaCamera /> },
+  { id: "picnic", icon: <MdOutdoorGrill /> },
+  { id: "stargazing", icon: <IoMoonSharp /> },
 ];
 
 function getScoreColor(score: number): string {
@@ -39,6 +39,25 @@ const ActivityFinderCard = ({
 }) => {
   const [selectedActivity, setSelectedActivity] =
     useState<OutdoorActivity>("running");
+  const { language } = useLanguage();
+  const activityLabels: Record<OutdoorActivity, string> =
+    language === "vi"
+      ? {
+          running: "Chạy bộ",
+          cycling: "Đạp xe",
+          hiking: "Leo núi",
+          photography: "Chụp ảnh",
+          picnic: "Dã ngoại",
+          stargazing: "Ngắm sao",
+        }
+      : {
+          running: "Running",
+          cycling: "Cycling",
+          hiking: "Hiking",
+          photography: "Photography",
+          picnic: "Picnic",
+          stargazing: "Stargazing",
+        };
 
   const result = useMemo(
     () =>
@@ -47,17 +66,22 @@ const ActivityFinderCard = ({
         weatherData.hourly,
         weatherData.current,
         weatherData.timezone_offset,
-        units
+        units,
+        language
       ),
-    [selectedActivity, weatherData, units]
+    [selectedActivity, weatherData, units, language]
   );
 
   return (
     <section className="activity-finder-card">
       <div className="section-header">
         <div>
-          <p className="section-label">Lập kế hoạch</p>
-          <h3>Khung giờ phù hợp cho hoạt động</h3>
+          <p className="section-label">{language === "vi" ? "Lập kế hoạch" : "Plan"}</p>
+          <h3>
+            {language === "vi"
+              ? "Khung giờ phù hợp cho hoạt động"
+              : "Best activity time slots"}
+          </h3>
         </div>
       </div>
 
@@ -70,7 +94,7 @@ const ActivityFinderCard = ({
             onClick={() => setSelectedActivity(a.id)}
           >
             {a.icon}
-            <span>{a.label}</span>
+            <span>{activityLabels[a.id]}</span>
           </button>
         ))}
       </div>
@@ -111,7 +135,7 @@ const ActivityFinderCard = ({
         ))}
       </div>
       <div className="heatmap-labels">
-        <span>Bây giờ</span>
+        <span>{language === "vi" ? "Bây giờ" : "Now"}</span>
         <span>+12h</span>
         <span>+24h</span>
       </div>

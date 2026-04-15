@@ -5,6 +5,7 @@ import { ImLocation } from "react-icons/im";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFavorites } from "@/app/hooks/useFavorites";
 import { formatStringToPath } from "@/app/utils/utility-functions";
+import { useLanguage } from "@/app/context/language-provider";
 
 const FavoritesPanel = ({
   isOpen,
@@ -16,6 +17,7 @@ const FavoritesPanel = ({
   const { favorites, removeFavorite } = useFavorites();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { language } = useLanguage();
 
   const handleNavigate = (city: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -30,21 +32,24 @@ const FavoritesPanel = ({
     <div className="favorites-panel">
       <div className="favorites-panel-header">
         <h4>
-          <IoStar /> Yêu thích
+          <IoStar /> {language === "vi" ? "Yêu thích" : "Favorites"}
         </h4>
         <button
           type="button"
           className="favorites-close-button"
           onClick={onClose}
-          aria-label="Đóng danh sách yêu thích"
+          aria-label={
+            language === "vi" ? "Đóng danh sách yêu thích" : "Close favorites list"
+          }
         >
           <IoClose />
         </button>
       </div>
       {favorites.length === 0 ? (
         <p className="favorites-empty">
-          Chưa có địa điểm yêu thích. Nhấn biểu tượng ngôi sao cạnh tên thành
-          phố để lưu.
+          {language === "vi"
+            ? "Chưa có địa điểm yêu thích. Nhấn biểu tượng ngôi sao cạnh tên thành phố để lưu."
+            : "No favorite places yet. Tap the star icon next to a city name to save it."}
         </p>
       ) : (
         <ul className="favorites-list">
@@ -64,7 +69,11 @@ const FavoritesPanel = ({
                 type="button"
                 className="favorite-remove"
                 onClick={() => removeFavorite(fav.id)}
-                aria-label={`Xóa ${fav.city} khỏi yêu thích`}
+                aria-label={
+                  language === "vi"
+                    ? `Xóa ${fav.city} khỏi yêu thích`
+                    : `Remove ${fav.city} from favorites`
+                }
               >
                 <IoClose />
               </button>

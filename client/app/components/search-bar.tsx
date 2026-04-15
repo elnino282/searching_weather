@@ -3,6 +3,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { formatLocationName } from "../utils/utility-functions";
+import { useLanguage } from "../context/language-provider";
 
 const requestOptions: RequestInit = {
   method: "POST",
@@ -33,6 +34,7 @@ const SearchBar = ({
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { language } = useLanguage();
   const [search, setSearch] = useState<string>(defaultValue ?? "");
   const [viewSuggestions, setViewSuggestions] = useState<boolean>(false);
   const [suggestions, setSuggestions] = useState<
@@ -128,8 +130,8 @@ const SearchBar = ({
           type="search"
           value={search}
           name="search"
-          placeholder="Tìm thành phố..."
-          aria-label="Tìm thành phố"
+          placeholder={language === "vi" ? "Tìm thành phố..." : "Search city..."}
+          aria-label={language === "vi" ? "Tìm thành phố" : "Search city"}
           onChange={(e) => handleChange(e.target.value)}
           size={17}
           autoComplete="off"
@@ -143,7 +145,11 @@ const SearchBar = ({
         <button
           type="submit"
           className="search-button"
-          aria-label="Tìm thời tiết theo thành phố"
+          aria-label={
+            language === "vi"
+              ? "Tìm thời tiết theo thành phố"
+              : "Search weather by city"
+          }
           onClick={() => {
             handleSubmit(search);
           }}

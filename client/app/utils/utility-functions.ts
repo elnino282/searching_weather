@@ -1,6 +1,42 @@
-export const formatDate = (seconds: number): string => {
+import { LanguageType } from "../types/types";
+
+export const formatDate = (
+  seconds: number,
+  language: LanguageType = "vi"
+): string => {
   const date: Date = new Date(seconds * 1000);
-  const days: string[] = [
+  const year = date.getFullYear();
+  const dateOfMonth = date.getDate();
+
+  if (language === "en") {
+    const days = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    return `${days[date.getDay()]}, ${months[date.getMonth()]} ${dateOfMonth}, ${year}`;
+  }
+
+  const days = [
     "Chủ Nhật",
     "Thứ Hai",
     "Thứ Ba",
@@ -9,7 +45,7 @@ export const formatDate = (seconds: number): string => {
     "Thứ Sáu",
     "Thứ Bảy",
   ];
-  const months: string[] = [
+  const months = [
     "tháng 1",
     "tháng 2",
     "tháng 3",
@@ -24,17 +60,18 @@ export const formatDate = (seconds: number): string => {
     "tháng 12",
   ];
 
-  const year: number = date.getFullYear();
-  const month: string = months[date.getMonth()];
-  const day: string = days[date.getDay()];
-  const dateOfMonth = date.getDate();
-
-  return `${day}, ${dateOfMonth} ${month}, ${year}`;
+  return `${days[date.getDay()]}, ${dateOfMonth} ${months[date.getMonth()]}, ${year}`;
 };
 
-export const getDay = (seconds: number): string => {
+export const getDay = (
+  seconds: number,
+  language: LanguageType = "vi"
+): string => {
   const date: Date = new Date(seconds * 1000);
-  const days: string[] = ["CN", "Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7"];
+  const days =
+    language === "en"
+      ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+      : ["CN", "Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7"];
   return days[date.getDay()];
 };
 
@@ -44,8 +81,14 @@ export const formatCamelCase = (text: string) => {
   );
 };
 
-export const translateWeatherDescription = (description: string): string => {
+export const translateWeatherDescription = (
+  description: string,
+  language: LanguageType = "vi"
+): string => {
   const normalized = description?.toLowerCase() ?? "";
+  if (language === "en") {
+    return formatCamelCase(description);
+  }
 
   if (normalized.includes("thunderstorm")) return "Dông";
   if (normalized.includes("drizzle")) return "Mưa phùn";
@@ -102,9 +145,18 @@ export const formatTime = (
   return showMinutes ? `${hours}:${minutes}` : `${hours}h`;
 };
 
-export const formatTimeDuration = (seconds: number): string => {
+export const formatTimeDuration = (
+  seconds: number,
+  language: LanguageType = "vi"
+): string => {
   const hours: number = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
+
+  if (language === "en") {
+    const hourLabel = hours === 1 ? "hour" : "hours";
+    const minuteLabel = minutes === 1 ? "minute" : "minutes";
+    return `${hours} ${hourLabel} ${minutes} ${minuteLabel}`;
+  }
 
   return `${hours} giờ ${minutes} phút`;
 };

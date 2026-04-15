@@ -10,6 +10,7 @@ import {
   UnitsType,
   WeatherDataResponse,
 } from "@/app/types/types";
+import { useLanguage } from "@/app/context/language-provider";
 
 const categoryIcons: Record<ActivityCategory, React.ReactNode> = {
   outdoor_exercise: <FaRunning />,
@@ -28,17 +29,18 @@ const RecommendationsCard = ({
   weatherData: WeatherDataResponse;
   units: UnitsType;
 }) => {
+  const { language } = useLanguage();
   const recommendations = useMemo(
-    () => generateRecommendations(weatherData, units),
-    [weatherData, units]
+    () => generateRecommendations(weatherData, units, language),
+    [weatherData, units, language]
   );
 
   return (
     <section className="recommendations-card">
       <div className="section-header">
         <div>
-          <p className="section-label">Gợi ý</p>
-          <h3>Gợi ý cho hôm nay</h3>
+          <p className="section-label">{language === "vi" ? "Gợi ý" : "Suggestions"}</p>
+          <h3>{language === "vi" ? "Gợi ý cho hôm nay" : "Today suggestions"}</h3>
         </div>
       </div>
       <div className="recommendation-grid">
@@ -58,7 +60,7 @@ const RecommendationsCard = ({
                     : "low"
               }`}
             >
-              {rec.confidence}% phù hợp
+              {rec.confidence}% {language === "vi" ? "phù hợp" : "match"}
             </div>
           </div>
         ))}

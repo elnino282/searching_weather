@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { deleteToken, getToken, onMessage, Messaging } from "firebase/messaging";
 import { getFirebaseMessaging } from "@/app/lib/firebaseConfig";
 import { useLocalStorage } from "./useLocalStorage";
+import { useLanguage } from "../context/language-provider";
 
 const VAPID_KEY = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
 const BACKEND_URI = process.env.NEXT_PUBLIC_BACKEND_URI ?? "http://localhost:4000/api";
@@ -17,6 +18,7 @@ interface NotificationMessage {
 }
 
 export function useNotifications() {
+  const { language } = useLanguage();
   const [permissionStatus, setPermissionStatus] = useState<PermissionStatus>("default");
   const [fcmToken, setFcmToken] = useState<string | null>(null);
   const [latestMessage, setLatestMessage] = useState<NotificationMessage | null>(null);
@@ -179,8 +181,14 @@ export function useNotifications() {
         console.log("[Foreground] Message received:", payload);
 
         const message: NotificationMessage = {
-          title: payload.notification?.title ?? "Cảnh báo thời tiết",
-          body: payload.notification?.body ?? "Bạn có một cảnh báo thời tiết mới.",
+          title:
+            payload.notification?.title ??
+            (language === "vi" ? "Cảnh báo thời tiết" : "Weather alert"),
+          body:
+            payload.notification?.body ??
+            (language === "vi"
+              ? "Bạn có một cảnh báo thời tiết mới."
+              : "You have a new weather alert."),
           data: payload.data,
         };
 
@@ -205,7 +213,7 @@ export function useNotifications() {
       isMounted = false;
       unsubscribeRef.current?.();
     };
-  }, [permissionStatus, pushEnabled]);
+  }, [language, permissionStatus, pushEnabled]);
 
   useEffect(() => {
     if (!pushEnabled) {

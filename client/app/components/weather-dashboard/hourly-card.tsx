@@ -6,6 +6,7 @@ import { selectWeatherIcon } from "./weather-dashboard";
 import { TbDropletsFilled } from "react-icons/tb";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { HourlyWeatherData, WeatherDataResponse } from "@/app/types/types";
+import { useLanguage } from "@/app/context/language-provider";
 
 const HourlyCard = ({
   weatherData,
@@ -17,6 +18,7 @@ const HourlyCard = ({
   graphHeight: number;
 }) => {
   const carouselRef = useRef<HTMLDivElement>(null);
+  const { language } = useLanguage();
   const hourlyData = useMemo(() => {
     if (!weatherData) return [];
     return weatherData?.hourly.slice(1, 25);
@@ -35,8 +37,8 @@ const HourlyCard = ({
     <section className="hourly-forecast-container">
       <div className="section-header">
         <div>
-          <p className="section-label">Dự báo</p>
-          <h3>24 giờ tới</h3>
+          <p className="section-label">{language === "vi" ? "Dự báo" : "Forecast"}</p>
+          <h3>{language === "vi" ? "24 giờ tới" : "Next 24 hours"}</h3>
         </div>
       </div>
 
@@ -44,7 +46,11 @@ const HourlyCard = ({
         <button
           type="button"
           className="left-button"
-          aria-label="Cuộn dự báo giờ sang trái"
+          aria-label={
+            language === "vi"
+              ? "Cuộn dự báo giờ sang trái"
+              : "Scroll hourly forecast to the left"
+          }
           onClick={() => scrollCarousel("left")}
         >
           <FaChevronLeft />
@@ -54,7 +60,11 @@ const HourlyCard = ({
         <button
           type="button"
           className="right-button"
-          aria-label="Cuộn dự báo giờ sang phải"
+          aria-label={
+            language === "vi"
+              ? "Cuộn dự báo giờ sang phải"
+              : "Scroll hourly forecast to the right"
+          }
           onClick={() => scrollCarousel("right")}
         >
           <FaChevronRight />

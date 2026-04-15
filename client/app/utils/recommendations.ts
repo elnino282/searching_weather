@@ -1,5 +1,6 @@
 import {
   DailyRecommendation,
+  LanguageType,
   UnitsType,
   WeatherDataResponse,
 } from "@/app/types/types";
@@ -24,7 +25,8 @@ function toMetricWind(speed: number, units: UnitsType): number {
 
 export function generateRecommendations(
   weatherData: WeatherDataResponse,
-  units: UnitsType
+  units: UnitsType,
+  language: LanguageType = "vi"
 ): DailyRecommendation[] {
   const tempC = toMetricTemp(weatherData.current.temp, units);
   const tempCategory = getTempCategory(tempC);
@@ -48,11 +50,16 @@ export function generateRecommendations(
       (windKmh > 20 ? 15 : 0);
     recommendations.push({
       category: "outdoor_exercise",
-      title: "Vận động ngoài trời",
+      title:
+        language === "vi" ? "Vận động ngoài trời" : "Outdoor exercise",
       description:
-        tempCategory === "warm"
-          ? "Điều kiện rất đẹp để chạy bộ hoặc đạp xe."
-          : "Mặc thêm áo và tận hưởng hoạt động ngoài trời.",
+        language === "vi"
+          ? tempCategory === "warm"
+            ? "Điều kiện rất đẹp để chạy bộ hoặc đạp xe."
+            : "Mặc thêm áo và tận hưởng hoạt động ngoài trời."
+          : tempCategory === "warm"
+            ? "Great conditions for running or cycling."
+            : "Layer up and enjoy time outdoors.",
       confidence: Math.max(20, Math.min(95, Math.round(score))),
     });
   }
@@ -66,10 +73,15 @@ export function generateRecommendations(
       (windKmh > 20 ? 10 : 0);
     recommendations.push({
       category: "casual_walk",
-      title: "Đi dạo nhẹ",
-      description: isClear
-        ? "Thời tiết lý tưởng để đi dạo quanh khu vực."
-        : "Điều kiện khá ổn cho một buổi đi bộ thư giãn.",
+      title: language === "vi" ? "Đi dạo nhẹ" : "Casual walk",
+      description:
+        language === "vi"
+          ? isClear
+            ? "Thời tiết lý tưởng để đi dạo quanh khu vực."
+            : "Điều kiện khá ổn cho một buổi đi bộ thư giãn."
+          : isClear
+            ? "The weather is ideal for a walk nearby."
+            : "Conditions are decent for a relaxed walk.",
       confidence: Math.max(20, Math.min(95, Math.round(score))),
     });
   }
@@ -83,13 +95,19 @@ export function generateRecommendations(
       avgPop * 20;
     recommendations.push({
       category: "photography",
-      title: "Nhiếp ảnh",
+      title: language === "vi" ? "Nhiếp ảnh" : "Photography",
       description:
-        condition === "clouds"
-          ? "Trời nhiều mây cho ánh sáng mềm và đều."
-          : isClear
-            ? "Trời quang, ánh sáng tự nhiên rất tốt."
-            : "Điều kiện khí quyển thú vị cho ảnh giàu cảm xúc.",
+        language === "vi"
+          ? condition === "clouds"
+            ? "Trời nhiều mây cho ánh sáng mềm và đều."
+            : isClear
+              ? "Trời quang, ánh sáng tự nhiên rất tốt."
+              : "Điều kiện khí quyển thú vị cho ảnh giàu cảm xúc."
+          : condition === "clouds"
+            ? "Cloud cover gives soft and balanced light."
+            : isClear
+              ? "Clear sky and strong natural light."
+              : "Atmosphere looks interesting for expressive shots.",
       confidence: Math.max(20, Math.min(95, Math.round(score))),
     });
   }
@@ -98,8 +116,11 @@ export function generateRecommendations(
   if (isClear && tempCategory === "hot" && !isWindy && avgPop < 0.2) {
     recommendations.push({
       category: "beach",
-      title: "Đi biển",
-      description: "Trời nóng và quang đãng, rất hợp để đi biển!",
+      title: language === "vi" ? "Đi biển" : "Beach time",
+      description:
+        language === "vi"
+          ? "Trời nóng và quang đãng, rất hợp để đi biển!"
+          : "Hot and sunny weather is perfect for the beach.",
       confidence: Math.min(95, Math.round(85 + (tempC - 25) * 2)),
     });
   }
@@ -108,10 +129,15 @@ export function generateRecommendations(
   if (isSnowy || (tempC < 2 && avgPop > 0.3)) {
     recommendations.push({
       category: "winter_sport",
-      title: "Thể thao mùa đông",
-      description: isSnowy
-        ? "Tuyết mới rơi, phù hợp cho các hoạt động mùa đông."
-        : "Trời lạnh và ẩm, phù hợp nếu khu vực có tuyết.",
+      title: language === "vi" ? "Thể thao mùa đông" : "Winter sports",
+      description:
+        language === "vi"
+          ? isSnowy
+            ? "Tuyết mới rơi, phù hợp cho các hoạt động mùa đông."
+            : "Trời lạnh và ẩm, phù hợp nếu khu vực có tuyết."
+          : isSnowy
+            ? "Fresh snowfall makes winter activities a great option."
+            : "Cold and wet conditions can suit winter activities if snow is nearby.",
       confidence: isSnowy ? 90 : 60,
     });
   }
@@ -125,10 +151,15 @@ export function generateRecommendations(
       (tempC < -5 || tempC > 38 ? 10 : 0);
     recommendations.push({
       category: "indoor_activity",
-      title: "Hoạt động trong nhà",
-      description: isRainy
-        ? "Ngoài trời có mưa, phù hợp đi bảo tàng, quán cà phê hoặc xem phim."
-        : "Thời tiết khắc nghiệt, ưu tiên hoạt động trong nhà.",
+      title: language === "vi" ? "Hoạt động trong nhà" : "Indoor activity",
+      description:
+        language === "vi"
+          ? isRainy
+            ? "Ngoài trời có mưa, phù hợp đi bảo tàng, quán cà phê hoặc xem phim."
+            : "Thời tiết khắc nghiệt, ưu tiên hoạt động trong nhà."
+          : isRainy
+            ? "Rain outside makes indoor plans like museums or cafes a better fit."
+            : "Conditions are harsh, so indoor activities are safer.",
       confidence: Math.min(95, Math.round(score)),
     });
   }
@@ -142,11 +173,15 @@ export function generateRecommendations(
   ) {
     recommendations.push({
       category: "stay_home",
-      title: "Ở nhà",
+      title: language === "vi" ? "Ở nhà" : "Stay home",
       description:
-        condition === "thunderstorm"
-          ? "Có dông, nên ở trong nhà để an toàn."
-          : "Điều kiện thời tiết cực đoan, nên ở nhà cho thoải mái.",
+        language === "vi"
+          ? condition === "thunderstorm"
+            ? "Có dông, nên ở trong nhà để an toàn."
+            : "Điều kiện thời tiết cực đoan, nên ở nhà cho thoải mái."
+          : condition === "thunderstorm"
+            ? "Thunderstorms are active, so staying indoors is safest."
+            : "Extreme weather makes staying home the best option.",
       confidence: 90,
     });
   }
@@ -156,16 +191,22 @@ export function generateRecommendations(
     if (!recommendations.some((r) => r.category === "casual_walk")) {
       recommendations.push({
         category: "casual_walk",
-        title: "Đi dạo nhẹ",
-        description: "Điều kiện hiện tại vẫn phù hợp cho một vòng đi bộ ngắn.",
+        title: language === "vi" ? "Đi dạo nhẹ" : "Casual walk",
+        description:
+          language === "vi"
+            ? "Điều kiện hiện tại vẫn phù hợp cho một vòng đi bộ ngắn."
+            : "Current conditions can still support a short walk.",
         confidence: 40,
       });
     }
     if (!recommendations.some((r) => r.category === "indoor_activity")) {
       recommendations.push({
         category: "indoor_activity",
-        title: "Hoạt động trong nhà",
-        description: "Lựa chọn an toàn và linh hoạt cho hôm nay.",
+        title: language === "vi" ? "Hoạt động trong nhà" : "Indoor activity",
+        description:
+          language === "vi"
+            ? "Lựa chọn an toàn và linh hoạt cho hôm nay."
+            : "A safe and flexible choice for today.",
         confidence: 50,
       });
     }

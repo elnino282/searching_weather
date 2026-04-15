@@ -3,6 +3,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useContext, useEffect } from "react";
 import { UnitContext, UnitContextType } from "../context/unit-provider";
 import { UnitsType } from "../types/types";
+import { useLanguage } from "../context/language-provider";
 
 const Toggle = ({
   option1,
@@ -16,6 +17,7 @@ const Toggle = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const { units, setUnits } = useContext<UnitContextType>(UnitContext);
+  const { language } = useLanguage();
   const fallbackOption = setOptionOneAsDefault ? option1 : option2;
   const selectedOption =
     units === option1.value ? option1 : units === option2.value ? option2 : fallbackOption;
@@ -49,7 +51,11 @@ const Toggle = ({
       type="button"
       className={`toggle-container ${units}`}
       onClick={toggleOption}
-      aria-label={`Chuyển đơn vị nhiệt độ. Đơn vị hiện tại ${selectedOption.name}.`}
+      aria-label={
+        language === "vi"
+          ? `Chuyển đơn vị nhiệt độ. Đơn vị hiện tại ${selectedOption.name}.`
+          : `Switch temperature unit. Current unit is ${selectedOption.name}.`
+      }
     >
       <span className="toggle-option option-left">{option1.name}</span>
       <span className="toggle-option option-right">{option2.name}</span>

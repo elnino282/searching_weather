@@ -3,6 +3,7 @@ import {
   CurrentWeatherData,
   HourlyActivityScore,
   HourlyWeatherData,
+  LanguageType,
   OutdoorActivity,
   UnitsType,
 } from "@/app/types/types";
@@ -90,11 +91,7 @@ function toKmh(speed: number, units: UnitsType): number {
   return units === "imperial" ? speed * 1.60934 : speed * 3.6;
 }
 
-function isGoldenHour(
-  dt: number,
-  sunrise: number,
-  sunset: number
-): boolean {
+function isGoldenHour(dt: number, sunrise: number, sunset: number): boolean {
   const hourAfterSunrise = dt >= sunrise && dt <= sunrise + 3600;
   const hourBeforeSunset = dt >= sunset - 3600 && dt <= sunset;
   return hourAfterSunrise || hourBeforeSunset;
@@ -104,7 +101,8 @@ function scoreHour(
   hour: HourlyWeatherData,
   profile: ActivityProfile,
   current: CurrentWeatherData,
-  units: UnitsType
+  units: UnitsType,
+  language: LanguageType
 ): { score: number; reasons: string[] } {
   let score = 100;
   const reasons: string[] = [];
@@ -120,56 +118,64 @@ function scoreHour(
   if (tempC < profile.idealTempMinC) {
     const diff = profile.idealTempMinC - tempC;
     score -= diff * 3;
-    if (diff > 5) reasons.push("Quá lạnh");
+    if (diff > 5) reasons.push(language === "vi" ? "Quá lạnh" : "Too cold");
   } else if (tempC > profile.idealTempMaxC) {
     const diff = tempC - profile.idealTempMaxC;
     score -= diff * 3;
-    if (diff > 5) reasons.push("Quá nóng");
+    if (diff > 5) reasons.push(language === "vi" ? "Quá nóng" : "Too hot");
   } else {
-    reasons.push("Nhiệt độ phù hợp");
+    reasons.push(
+      language === "vi" ? "Nhiệt độ phù hợp" : "Comfortable temperature"
+    );
   }
 
   // Precipitation scoring
   if (pop > profile.maxPop) {
     score -= (pop - profile.maxPop) * 0.8;
-    reasons.push(`${Math.round(pop)}% khả năng mưa`);
+    reasons.push(
+      language === "vi"
+        ? `${Math.round(pop)}% khả năng mưa`
+        : `${Math.round(pop)}% chance of rain`
+    );
   }
 
   // Wind scoring (estimated)
   if (estWindKmh > profile.maxWindKmh) {
     score -= (estWindKmh - profile.maxWindKmh) * 1.5;
-    reasons.push("Gió mạnh");
+    reasons.push(language === "vi" ? "Gió mạnh" : "Strong wind");
   }
 
   // Weather condition scoring
   if (profile.clearOnly && !["clear", "clouds"].includes(condition)) {
     score -= 30;
-    reasons.push("Thời tiết không thuận lợi");
+    reasons.push(
+      language === "vi" ? "Thời tiết không thuận lợi" : "Unfavorable weather"
+    );
   }
 
   if (["thunderstorm", "snow"].includes(condition)) {
     score -= 40;
-    reasons.push("Thời tiết xấu");
+    reasons.push(language === "vi" ? "Thời tiết xấu" : "Severe weather");
   }
 
   // Time preference scoring
   if (profile.preferDaylight && !isDaytime) {
     score -= 25;
-    reasons.push("Đã tối");
+    reasons.push(language === "vi" ? "Đã tối" : "After dark");
   }
 
   if (profile.preferGoldenHour && goldenHour) {
     score += 15;
-    reasons.push("Giờ vàng");
+    reasons.push(language === "vi" ? "Giờ vàng" : "Golden hour");
   }
 
   if (profile.preferNight) {
     if (isDaytime) {
       score -= 30;
-      reasons.push("Quá sáng");
+      reasons.push(language === "vi" ? "Quá sáng" : "Too bright");
     } else {
       score += 10;
-      reasons.push("Trời tối");
+      reasons.push(language === "vi" ? "Trời tối" : "Night sky");
     }
   }
 
@@ -181,30 +187,47 @@ export function findBestTimes(
   hourlyData: HourlyWeatherData[],
   currentData: CurrentWeatherData,
   timezoneOffset: number,
-  units: UnitsType
+  units: UnitsType,
+  language: LanguageType = "vi"
 ): ActivityTimeFinder {
   const profile = activityProfiles[activity];
   const hours = hourlyData.slice(0, 24);
 
   const allHours: HourlyActivityScore[] = hours.map((hour) => {
-    const { score, reasons } = scoreHour(hour, profile, currentData, units);
+    const { score, reasons } = scoreHour(
+      hour,
+      profile,
+      currentData,
+      units,
+      language
+    );
     return { dt: hour.dt, score, reasons };
   });
 
-  const bestHours = [...allHours]
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 5);
+  const bestHours = [...allHours].sort((a, b) => b.score - a.score).slice(0, 5);
 
   const bestScore = bestHours[0]?.score ?? 0;
   let overallVerdict: string;
   if (bestScore >= 80) {
-    overallVerdict = "Điều kiện hôm nay rất tốt, nên đi ngay!";
+    overallVerdict =
+      language === "vi"
+        ? "Điều kiện hôm nay rất tốt, nên đi ngay!"
+        : "Conditions are excellent today. Great time to go.";
   } else if (bestScore >= 60) {
-    overallVerdict = "Điều kiện khá ổn, có vài khung giờ phù hợp.";
+    overallVerdict =
+      language === "vi"
+        ? "Điều kiện khá ổn, có vài khung giờ phù hợp."
+        : "Conditions are fairly good with several suitable time slots.";
   } else if (bestScore >= 40) {
-    overallVerdict = "Điều kiện trung bình, nên cân nhắc kỹ.";
+    overallVerdict =
+      language === "vi"
+        ? "Điều kiện trung bình, nên cân nhắc kỹ."
+        : "Conditions are average, so plan carefully.";
   } else {
-    overallVerdict = "Điều kiện hôm nay kém, nên dời lịch.";
+    overallVerdict =
+      language === "vi"
+        ? "Điều kiện hôm nay kém, nên dời lịch."
+        : "Conditions are poor today. Consider postponing.";
   }
 
   return { activity, bestHours, allHours, overallVerdict };

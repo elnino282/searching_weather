@@ -6,6 +6,7 @@ import WeatherDashboard from "./weather-dashboard/weather-dashboard";
 import { WeatherContext } from "../context/weather-provider";
 import { PeriodContext } from "../context/period-provider";
 import { useNotifications } from "@/app/hooks/useNotifications";
+import { useLanguage } from "../context/language-provider";
 
 const WeatherApp = ({
   location,
@@ -17,6 +18,7 @@ const WeatherApp = ({
   const { weather } = useContext(WeatherContext);
   const { period } = useContext(PeriodContext);
   const { latestMessage, clearLatestMessage } = useNotifications();
+  const { language } = useLanguage();
 
   return (
     <main className={`weather-app ${period}`} id={weather}>
@@ -33,7 +35,9 @@ const WeatherApp = ({
                 type="button"
                 className="fcm-toast-close"
                 onClick={clearLatestMessage}
-                aria-label="Đóng thông báo"
+                aria-label={
+                  language === "vi" ? "Đóng thông báo" : "Close notification"
+                }
               >
                 ×
               </button>

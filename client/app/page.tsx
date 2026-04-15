@@ -2,6 +2,7 @@ import React from "react";
 import WeatherApp from "./components/weather-app";
 import WeatherContextProvider from "./context/weather-provider";
 import PeriodContextProvider from "./context/period-provider";
+import LanguageContextProvider from "./context/language-provider";
 
 const WeatherPage = async ({
   searchParams,
@@ -13,7 +14,9 @@ const WeatherPage = async ({
     <div className="weather-app-container">
       <WeatherContextProvider>
         <PeriodContextProvider>
-          <WeatherApp units={units} location={location} />
+          <LanguageContextProvider>
+            <WeatherApp units={units} location={location} />
+          </LanguageContextProvider>
         </PeriodContextProvider>
       </WeatherContextProvider>
     </div>

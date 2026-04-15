@@ -1,4 +1,5 @@
 export type UnitsType = "metric" | "imperial";
+export type LanguageType = "vi" | "en";
 
 export type WeatherType =
   | "clouds"

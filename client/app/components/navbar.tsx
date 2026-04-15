@@ -8,12 +8,15 @@ import { TiWeatherPartlySunny } from "react-icons/ti";
 import { useFavorites } from "@/app/hooks/useFavorites";
 import { useRouter, useSearchParams } from "next/navigation";
 import { formatStringToPath } from "@/app/utils/utility-functions";
+import LanguageToggle from "./language-toggle";
+import { useLanguage } from "@/app/context/language-provider";
 
 const Navbar = () => {
   const [showing, setShowing] = useState<boolean>(false);
   const { favorites, removeFavorite } = useFavorites();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { language } = useLanguage();
 
   const handleNavigate = (city: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -38,12 +41,17 @@ const Navbar = () => {
             option1={{ name: "C", value: "metric" }}
             option2={{ name: "F", value: "imperial" }}
           />
+          <LanguageToggle />
           <button
             type="button"
             className="nav-menu-button"
             aria-controls="mobile-side-nav"
             aria-expanded={showing}
-            aria-label="Mở bảng tìm kiếm thành phố"
+            aria-label={
+              language === "vi"
+                ? "Mở bảng tìm kiếm thành phố"
+                : "Open city search panel"
+            }
             onClick={() => setShowing((prev) => !prev)}
           >
             <IoMenu />
@@ -63,7 +71,7 @@ const Navbar = () => {
           {favorites.length > 0 && (
             <div className="mobile-favorites">
               <p className="mobile-favorites-title">
-                <IoStar /> Yêu thích
+                <IoStar /> {language === "vi" ? "Yêu thích" : "Favorites"}
               </p>
               <ul className="mobile-favorites-list">
                 {favorites.map((fav) => (
@@ -82,7 +90,11 @@ const Navbar = () => {
                       type="button"
                       className="favorite-remove"
                       onClick={() => removeFavorite(fav.id)}
-                      aria-label={`Xóa ${fav.city} khỏi yêu thích`}
+                      aria-label={
+                        language === "vi"
+                          ? `Xóa ${fav.city} khỏi yêu thích`
+                          : `Remove ${fav.city} from favorites`
+                      }
                     >
                       <IoClose />
                     </button>
