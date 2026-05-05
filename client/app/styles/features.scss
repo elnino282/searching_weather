@@ -744,6 +744,202 @@
   margin-top: var(--space-1);
 }
 
+/* ===== SHARE SNAPSHOT ===== */
+.share-snapshot-trigger {
+  align-items: center;
+  color: var(--accent-cyan);
+  display: inline-flex;
+  font-size: 1.15em;
+  margin-left: var(--space-2);
+  padding: 0;
+  transition: transform 0.2s ease, color 0.2s ease;
+  vertical-align: middle;
+
+  &:hover {
+    color: var(--accent-soft);
+    transform: scale(1.18);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.share-overlay {
+  align-items: center;
+  animation: share-fade-in 0.25s ease forwards;
+  backdrop-filter: blur(12px);
+  background: rgba(2, 6, 18, 0.72);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: var(--space-4);
+  position: fixed;
+  z-index: 9999;
+}
+
+@keyframes share-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.share-modal {
+  animation: share-slide-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  backdrop-filter: blur(20px);
+  background: linear-gradient(
+    160deg,
+    rgba(11, 24, 56, 0.92),
+    rgba(8, 16, 37, 0.96)
+  );
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-height: 90vh;
+  max-width: 420px;
+  overflow: hidden;
+  padding: var(--space-4);
+  width: 100%;
+}
+
+@keyframes share-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(2rem) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.share-modal-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+
+  h3 {
+    font-size: var(--fs-400);
+    line-height: var(--lh-tight);
+  }
+}
+
+.share-modal-close {
+  align-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-soft);
+  display: flex;
+  font-size: 1.3rem;
+  padding: var(--space-1);
+  transition: color 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-color);
+  }
+}
+
+.share-canvas-wrapper {
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.share-canvas {
+  display: block;
+  height: auto !important;
+  width: 100%;
+}
+
+.share-canvas-loading {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--text-muted);
+  display: flex;
+  font-size: var(--fs-200);
+  inset: 0;
+  justify-content: center;
+  position: absolute;
+}
+
+.share-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.share-action-btn {
+  align-items: center;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: var(--fs-200);
+  gap: var(--space-2);
+  justify-content: center;
+  padding: var(--space-3) var(--space-4);
+  transition: background 0.25s ease, border-color 0.25s ease,
+    transform 0.15s ease;
+
+  svg {
+    font-size: 1.15rem;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.share-download-btn {
+  background: linear-gradient(
+    135deg,
+    rgba(134, 227, 255, 0.15),
+    rgba(99, 102, 241, 0.15)
+  );
+  border: 1px solid rgba(134, 227, 255, 0.35);
+  color: var(--accent-cyan);
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(134, 227, 255, 0.25),
+      rgba(99, 102, 241, 0.25)
+    );
+    border-color: rgba(134, 227, 255, 0.55);
+    transform: translateY(-1px);
+  }
+}
+
+.share-share-btn {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 222, 128, 0.14),
+    rgba(52, 211, 153, 0.18)
+  );
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  color: var(--score-excellent);
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(74, 222, 128, 0.24),
+      rgba(52, 211, 153, 0.28)
+    );
+    border-color: rgba(74, 222, 128, 0.55);
+    transform: translateY(-1px);
+  }
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 449px) {
   .recommendation-grid {

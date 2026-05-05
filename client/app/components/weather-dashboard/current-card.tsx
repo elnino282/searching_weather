@@ -19,6 +19,7 @@ import { WeatherContext } from "@/app/context/weather-provider";
 import { PeriodContext } from "@/app/context/period-provider";
 import { PeriodType, WeatherDataResponse, WeatherType } from "@/app/types/types";
 import FavoriteButton from "../favorites/favorite-button";
+import ShareSnapshotButton from "./share-snapshot-button";
 import { useLanguage } from "@/app/context/language-provider";
 
 const CurrentCard = ({
@@ -103,10 +104,11 @@ const CurrentCard = ({
               {language === "vi" ? "Thời tiết hiện tại" : "Current weather"}
             </p>
             <p id="current-time">{getCurrentTime(weatherData?.timezone_offset)}</p>
-            <p id="current-location">
+            <div id="current-location">
               <ImLocation /> {weatherData?.name}, {weatherData?.country}
               <FavoriteButton city={weatherData?.name} country={weatherData?.country} />
-            </p>
+              <ShareSnapshotButton weatherData={weatherData} units={units} />
+            </div>
             <p id="current-date">{formatDate(weatherData?.current.dt, language)}</p>
           </div>
           <div className="weather-container">
