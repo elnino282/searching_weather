@@ -7,6 +7,7 @@ import { WeatherContext } from "../context/weather-provider";
 import { PeriodContext } from "../context/period-provider";
 import { useNotifications } from "@/app/hooks/useNotifications";
 import { useLanguage } from "../context/language-provider";
+import NetworkStatusBanner from "./pwa/NetworkStatusBanner";
 
 const WeatherApp = ({
   location,
@@ -49,6 +50,7 @@ const WeatherApp = ({
             units={units ?? "metric"}
             defaultLocation="Toronto"
           />
+          <NetworkStatusBanner />
         </div>
       </UnitContextProvider>
     </main>

@@ -1,0 +1,16 @@
+{
+  "name": "WeCliFor Weather App",
+  "short_name": "WeCliFor",
+  "description": "A beautiful and responsive weather application.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    {
+      "src": "/icon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}

@@ -135,7 +135,7 @@ const WeatherDashboard = ({
   const { language } = useLanguage();
 
   const triggeredAlerts = useMemo(() => {
-    if (!weatherData) return [];
+    if (!weatherData || !weatherData.current) return [];
     return checkAlerts(weatherData, (units as UnitsType) ?? "metric");
   }, [weatherData, units, checkAlerts]);
 
@@ -187,7 +187,7 @@ const WeatherDashboard = ({
       style={{ "--hourly-section-width": `${hourlySectionWidth}px` }}
     >
       {!loading ? (
-        weatherData ? (
+        weatherData && weatherData.current ? (
           <div className="weather-data-container">
             <AlertBanner triggeredAlerts={triggeredAlerts} currentUnits={units} />
             <CurrentCard weatherData={weatherData} units={measuringUnits} />

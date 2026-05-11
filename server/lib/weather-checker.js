@@ -72,7 +72,7 @@ function convertWind(value, from, to) {
  * Returns a notification payload if triggered, or null.
  */
 function evaluateAlert(alert, weatherData) {
-  if (!alert.enabled) return null;
+  if (!alert.enabled || !weatherData || !weatherData.current) return null;
 
   // Check location match
   if (
