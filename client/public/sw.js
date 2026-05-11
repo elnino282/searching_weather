@@ -1,6 +1,6 @@
-const CACHE_NAME = 'weclifor-pwa-cache-v1';
-const DYNAMIC_CACHE_NAME = 'weclifor-dynamic-cache-v1';
-const API_CACHE_NAME = 'weclifor-api-cache-v1';
+const CACHE_NAME = 'weclifor-pwa-cache-v2';
+const DYNAMIC_CACHE_NAME = 'weclifor-dynamic-cache-v2';
+const API_CACHE_NAME = 'weclifor-api-cache-v2';
 
 // Assets to cache immediately on install
 const INITIAL_CACHED_RESOURCES = [
@@ -24,10 +24,10 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (
+            cacheName.startsWith('weclifor-') &&
             cacheName !== CACHE_NAME &&
             cacheName !== DYNAMIC_CACHE_NAME &&
-            cacheName !== API_CACHE_NAME &&
-            cacheName.startsWith('weclifor-')
+            cacheName !== API_CACHE_NAME
           ) {
             return caches.delete(cacheName);
           }
@@ -43,20 +43,29 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
 
   // Handle API requests (Network First, fallback to cache)
-  if (url.href.includes('/api/')) { // Adjust based on your backend URL pattern if needed, or check if it matches the backend URI
+  if (url.href.includes('/api')) { 
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const responseClone = response.clone();
-          caches.open(API_CACHE_NAME).then((cache) => {
-            cache.put(request, responseClone);
+          // If the network request succeeded and the response is OK, cache it
+          if (response.ok) {
+            const responseClone = response.clone();
+            caches.open(API_CACHE_NAME).then((cache) => {
+              cache.put(request, responseClone);
+            });
+            return response;
+          }
+          
+          // If the response is NOT ok (e.g. 502 from backend), try to serve from cache
+          return caches.match(request).then((cachedResponse) => {
+            return cachedResponse || response;
           });
-          return response;
         })
         .catch(() => {
-          return caches.match(request).then((response) => {
-            if (response) {
-              return response;
+          // If the network request failed entirely (e.g. server down), serve from cache
+          return caches.match(request).then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
             }
             throw new Error('No offline data available');
           });

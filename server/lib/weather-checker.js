@@ -26,8 +26,8 @@ async function fetchWeatherForCity(cityName, units = "metric") {
     const geoRes = await fetch(geoUrl);
     const geoData = await geoRes.json();
 
-    if (!geoData || geoData.length === 0) {
-      console.warn(`[WeatherChecker] City not found: ${cityName}`);
+    if (!Array.isArray(geoData) || geoData.length === 0) {
+      console.warn(`[WeatherChecker] City not found or API error for: ${cityName}`);
       return null;
     }
 

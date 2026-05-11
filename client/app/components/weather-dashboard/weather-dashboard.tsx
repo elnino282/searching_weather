@@ -203,14 +203,29 @@ const WeatherDashboard = ({
           </div>
         ) : (
           <div className="no-results-container">
-            <h2>
-              {language === "vi" ? "Không tìm thấy kết quả" : "No results found"}
-            </h2>
-            <p>
-              {language === "vi"
-                ? "Hãy thử tên thành phố khác."
-                : "Try searching for a different city."}
-            </p>
+            {weatherData?.cod === 429 ? (
+              <>
+                <h2>
+                  {language === "vi" ? "Đã vượt quá giới hạn API" : "API Limit Exceeded"}
+                </h2>
+                <p>
+                  {language === "vi"
+                    ? "Tài khoản OpenWeatherMap của bạn đã hết lượt truy cập hôm nay."
+                    : "Your OpenWeatherMap account has exceeded its request limit for today."}
+                </p>
+              </>
+            ) : (
+              <>
+                <h2>
+                  {language === "vi" ? "Không tìm thấy kết quả" : "No results found"}
+                </h2>
+                <p>
+                  {language === "vi"
+                    ? "Hãy thử tên thành phố khác."
+                    : "Try searching for a different city."}
+                </p>
+              </>
+            )}
           </div>
         )
       ) : (
