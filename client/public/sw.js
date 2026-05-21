@@ -1,6 +1,6 @@
-const CACHE_NAME = 'weclifor-pwa-cache-v2';
-const DYNAMIC_CACHE_NAME = 'weclifor-dynamic-cache-v2';
-const API_CACHE_NAME = 'weclifor-api-cache-v2';
+const CACHE_NAME = 'weclifor-pwa-cache-v3';
+const DYNAMIC_CACHE_NAME = 'weclifor-dynamic-cache-v3';
+const API_CACHE_NAME = 'weclifor-api-cache-v3';
 
 // Assets to cache immediately on install
 const INITIAL_CACHED_RESOURCES = [
@@ -41,6 +41,15 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
+  const shouldBypassApiCache =
+    url.pathname.includes('/api/auth') ||
+    url.pathname.includes('/api/admin') ||
+    url.pathname.includes('/api/config');
+
+  if (shouldBypassApiCache) {
+    event.respondWith(fetch(request));
+    return;
+  }
 
   // Handle API requests (Network First, fallback to cache)
   if (url.href.includes('/api')) { 

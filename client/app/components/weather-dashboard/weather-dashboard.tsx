@@ -25,6 +25,8 @@ import RecommendationsCard from "../recommendations/recommendations-card";
 import ActivityFinderCard from "../activity-finder/activity-finder-card";
 import { useAlertPreferences } from "@/app/hooks/useAlertPreferences";
 import { useLanguage } from "@/app/context/language-provider";
+import { useFeatureFlags } from "@/app/context/feature-flags-provider";
+import type { NotificationControls } from "@/app/hooks/useNotifications";
 
 export const checkIfDay = (
   dt: number,
@@ -120,19 +122,23 @@ const WeatherDashboard = ({
   location,
   units,
   defaultLocation,
+  notificationControls,
   hourlySectionWidth = 100,
   graphHeight = 150,
 }: {
   location: string;
   units: string;
   defaultLocation: string;
+  notificationControls: NotificationControls;
   hourlySectionWidth?: number;
   graphHeight?: number;
 }) => {
   const [weatherData, setWeatherData] = useState<WeatherDataResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const { checkAlerts } = useAlertPreferences();
+  const alertPreferences = useAlertPreferences(notificationControls.fcmToken);
+  const { checkAlerts } = alertPreferences;
   const { language } = useLanguage();
+  const { features } = useFeatureFlags();
 
   const triggeredAlerts = useMemo(() => {
     if (!weatherData || !weatherData.current) return [];
@@ -159,7 +165,7 @@ const WeatherDashboard = ({
     };
 
     fetchData();
-  }, [defaultLocation, location, units]);
+  }, [defaultLocation, features.aqiEnabled, location, units]);
 
   const measuringUnits = useMemo(() => {
     if (units === "imperial") {
@@ -184,13 +190,19 @@ const WeatherDashboard = ({
   return (
     <section
       className="weather-dashboard"
-      style={{ "--hourly-section-width": `${hourlySectionWidth}px` }}
+      style={
+        { "--hourly-section-width": `${hourlySectionWidth}px` } as React.CSSProperties
+      }
     >
       {!loading ? (
         weatherData && weatherData.current ? (
           <div className="weather-data-container">
             <AlertBanner triggeredAlerts={triggeredAlerts} currentUnits={units} />
-            <CurrentCard weatherData={weatherData} units={measuringUnits} />
+            <CurrentCard
+              weatherData={weatherData}
+              units={measuringUnits}
+              aqiEnabled={features.aqiEnabled}
+            />
             <HourlyCard
               weatherData={weatherData}
               hourlySectionWidth={hourlySectionWidth}
@@ -199,7 +211,11 @@ const WeatherDashboard = ({
             <DailyCard weatherData={weatherData} />
             <RecommendationsCard weatherData={weatherData} units={(units as UnitsType) ?? "metric"} />
             <ActivityFinderCard weatherData={weatherData} units={(units as UnitsType) ?? "metric"} />
-            <AlertSettingsCard locationName={weatherData.name} />
+            <AlertSettingsCard
+              locationName={weatherData.name}
+              notificationControls={notificationControls}
+              alertPreferences={alertPreferences}
+            />
           </div>
         ) : (
           <div className="no-results-container">

@@ -2,29 +2,43 @@
 import React, { useContext, useState } from "react";
 import { IoAdd, IoTrash } from "react-icons/io5";
 import { MdNotificationsActive, MdNotificationsOff } from "react-icons/md";
-import { useAlertPreferences } from "@/app/hooks/useAlertPreferences";
-import { useNotifications } from "@/app/hooks/useNotifications";
 import { UnitContext } from "@/app/context/unit-provider";
 import { AlertComparator, AlertMetric } from "@/app/types/types";
 import { useLanguage } from "@/app/context/language-provider";
+import type { AlertPreferencesControls } from "@/app/hooks/useAlertPreferences";
+import type { NotificationControls } from "@/app/hooks/useNotifications";
 
-const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
+type AlertSettingsCardProps = {
+  locationName: string;
+  notificationControls: NotificationControls;
+  alertPreferences: Pick<
+    AlertPreferencesControls,
+    "alerts" | "addAlert" | "removeAlert" | "toggleAlert"
+  >;
+};
+
+const AlertSettingsCard = ({
+  locationName,
+  notificationControls,
+  alertPreferences,
+}: AlertSettingsCardProps) => {
   const {
     permissionStatus,
     fcmToken,
     pushEnabled,
     isTogglingPush,
+    isRequestingPermission,
+    notificationError,
     requestNotificationPermission,
     disablePushNotifications,
-  } = useNotifications();
-  const { alerts, addAlert, removeAlert, toggleAlert } = useAlertPreferences(fcmToken);
+  } = notificationControls;
+  const { alerts, addAlert, removeAlert, toggleAlert } = alertPreferences;
   const { units } = useContext(UnitContext);
   const { language } = useLanguage();
   const [showForm, setShowForm] = useState(false);
   const [metric, setMetric] = useState<AlertMetric>("temp");
   const [comparator, setComparator] = useState<AlertComparator>("above");
   const [threshold, setThreshold] = useState<string>("");
-  const [enablingPush, setEnablingPush] = useState(false);
 
   const copy =
     language === "vi"
@@ -106,9 +120,7 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
   };
 
   const handleEnablePush = async () => {
-    setEnablingPush(true);
-    await requestNotificationPermission();
-    setEnablingPush(false);
+    await requestNotificationPermission({ forceRegister: true });
   };
 
   const handleDisablePush = async () => {
@@ -172,10 +184,10 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
                 type="button"
                 className="alert-enable-push-btn"
                 onClick={handleEnablePush}
-                disabled={enablingPush}
+                disabled={isRequestingPermission}
               >
                 <MdNotificationsActive />
-                {enablingPush ? copy.enableLoading : copy.enablePush}
+                {isRequestingPermission ? copy.enableLoading : copy.enablePush}
               </button>
             )}
           </>
@@ -194,11 +206,18 @@ const AlertSettingsCard = ({ locationName }: { locationName: string }) => {
             type="button"
             className="alert-enable-push-btn"
             onClick={handleEnablePush}
-            disabled={enablingPush}
+            disabled={isRequestingPermission}
           >
             <MdNotificationsActive />
-            {enablingPush ? copy.enableLoading : copy.enablePush}
+            {isRequestingPermission ? copy.enableLoading : copy.enablePush}
           </button>
+        )}
+
+        {notificationError && permissionStatus !== "denied" && (
+          <div className="alert-push-badge alert-push-denied">
+            <MdNotificationsOff />
+            <span>{notificationError}</span>
+          </div>
         )}
       </div>
 

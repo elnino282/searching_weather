@@ -40,7 +40,7 @@ const LineGraph = ({
   return (
     <div
       className="line-graph"
-      style={{ "--graph-width": graphWidth + "px" }}
+      style={{ "--graph-width": graphWidth + "px" } as React.CSSProperties}
       id={id}
     >
       <svg width={graphWidth} height={graphHeight}>

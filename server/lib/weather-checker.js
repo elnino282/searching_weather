@@ -5,49 +5,11 @@ const {
   isFirebaseAdminReady,
   firebaseInitMessage,
 } = require("./firebase-admin");
+const { fetchWeatherForCity } = require("./weather-service");
 
 const SUBSCRIPTIONS_COLLECTION = "subscriptions";
 // Cooldown: don't re-notify the same device within this many milliseconds
 const NOTIFICATION_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
-
-/**
- * Fetch weather data from OpenWeatherMap for a given city.
- */
-async function fetchWeatherForCity(cityName, units = "metric") {
-  const weatherKey = process.env.OPEN_WEATHER_API_KEY;
-  if (!weatherKey) {
-    console.error("[WeatherChecker] OPEN_WEATHER_API_KEY not set");
-    return null;
-  }
-
-  try {
-    // Step 1: Geocode city name
-    const geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(cityName)}&appid=${weatherKey}`;
-    const geoRes = await fetch(geoUrl);
-    const geoData = await geoRes.json();
-
-    if (!Array.isArray(geoData) || geoData.length === 0) {
-      console.warn(`[WeatherChecker] City not found or API error for: ${cityName}`);
-      return null;
-    }
-
-    const { lat, lon } = geoData[0];
-
-    // Step 2: Fetch weather
-    const weatherUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&units=${units}&appid=${weatherKey}`;
-    const weatherRes = await fetch(weatherUrl);
-    const weatherData = await weatherRes.json();
-
-    return {
-      ...weatherData,
-      name: geoData[0].name,
-      country: geoData[0].country,
-    };
-  } catch (error) {
-    console.error(`[WeatherChecker] Error fetching weather for ${cityName}:`, error.message);
-    return null;
-  }
-}
 
 /**
  * Convert temperature between metric and imperial.

@@ -32,24 +32,48 @@ export default function PWAProvider({
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    // Register Service Worker
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("/sw.js")
-          .then((reg) => {
-            console.log("Service Worker registered successfully:", reg);
-            setRegistration(reg);
-          })
-          .catch((err) => {
-            console.error("Service Worker registration failed:", err);
-          });
-      });
+    if (process.env.NODE_ENV !== "production") {
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistration("/").then((reg) => {
+          reg?.unregister();
+        });
+      }
+
+      if ("caches" in window) {
+        window.caches.keys().then((cacheNames) => {
+          cacheNames
+            .filter((cacheName) => cacheName.startsWith("weclifor-"))
+            .forEach((cacheName) => window.caches.delete(cacheName));
+        });
+      }
+    }
+
+    const registerServiceWorker = () => {
+      if (process.env.NODE_ENV !== "production" || !("serviceWorker" in navigator)) {
+        return;
+      }
+
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((reg) => {
+          console.log("Service Worker registered successfully:", reg);
+          setRegistration(reg);
+        })
+        .catch((err) => {
+          console.error("Service Worker registration failed:", err);
+        });
+    };
+
+    if (document.readyState === "complete") {
+      registerServiceWorker();
+    } else {
+      window.addEventListener("load", registerServiceWorker);
     }
 
     return () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
+      window.removeEventListener("load", registerServiceWorker);
     };
   }, []);
 

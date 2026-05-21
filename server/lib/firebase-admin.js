@@ -76,10 +76,51 @@ try {
   console.error(`[FirebaseAdmin] ${firebaseInitMessage}`);
 }
 
+function sanitizeHealthError(error) {
+  return String(error?.message || error || "Unknown Firebase error")
+    .replace(/AIza[0-9A-Za-z_-]+/g, "[redacted]")
+    .replace(/key=([^&\s]+)/gi, "key=[redacted]")
+    .slice(0, 240);
+}
+
+async function checkFirestoreHealth() {
+  if (!isFirebaseAdminReady || !db) {
+    return {
+      status: "DOWN",
+      error: firebaseInitMessage || "Firebase Admin is not configured.",
+    };
+  }
+
+  const start = Date.now();
+
+  try {
+    await db.collection("runtimeConfig").doc("public").get();
+    return {
+      status: "UP",
+      latencyMs: Date.now() - start,
+    };
+  } catch (error) {
+    return {
+      status: "DOWN",
+      latencyMs: Date.now() - start,
+      error: sanitizeHealthError(error),
+    };
+  }
+}
+
+function getFirebaseAdminHealth() {
+  return {
+    status: isFirebaseAdminReady ? "UP" : "DOWN",
+    message: firebaseInitMessage,
+  };
+}
+
 module.exports = {
   admin,
   db,
   messaging,
   isFirebaseAdminReady,
   firebaseInitMessage,
+  checkFirestoreHealth,
+  getFirebaseAdminHealth,
 };

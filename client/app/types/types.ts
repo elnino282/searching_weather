@@ -60,13 +60,15 @@ export interface AirQualityData {
 
 export interface WeatherDataResponse {
   imageUrl: string | null;
+  cod?: number | string;
+  message?: string;
   timezone_offset: number;
   name: string;
   country: string;
   current: CurrentWeatherData;
   hourly: HourlyWeatherData[];
   daily: DailyWeatherData[];
-  list: AirQualityData[];
+  list?: AirQualityData[];
 }
 
 // Favorites

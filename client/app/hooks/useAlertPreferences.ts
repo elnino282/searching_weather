@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useLocalStorage } from "./useLocalStorage";
 import {
   AlertPreference,
@@ -7,8 +7,24 @@ import {
   UnitsType,
   WeatherDataResponse,
 } from "@/app/types/types";
+import { getAlertPreferencesSyncStorageKey } from "@/app/lib/alertSubscriptionStorage";
 
 const BACKEND_URI = process.env.NEXT_PUBLIC_BACKEND_URI ?? "http://localhost:4000/api";
+const ALERT_SYNC_DEBOUNCE_MS = 400;
+const lastSyncedAlertsByToken = new Map<string, string>();
+
+export interface AlertPreferencesControls {
+  alerts: AlertPreference[];
+  alertsHydrated: boolean;
+  addAlert: (alert: Omit<AlertPreference, "id">) => void;
+  updateAlert: (id: string, updates: Partial<AlertPreference>) => void;
+  removeAlert: (id: string) => void;
+  toggleAlert: (id: string) => void;
+  checkAlerts: (
+    weatherData: WeatherDataResponse,
+    currentUnits: UnitsType
+  ) => TriggeredAlert[];
+}
 
 function convertTemp(value: number, from: UnitsType, to: UnitsType): number {
   if (from === to) return value;
@@ -22,30 +38,60 @@ function convertWind(value: number, from: UnitsType, to: UnitsType): number {
   return value / 1.60934;
 }
 
-// Sync alerts to backend (fire-and-forget)
 async function syncAlertsToBackend(alerts: AlertPreference[], fcmToken: string | null) {
   if (!fcmToken) return;
-  try {
-    await fetch(`${BACKEND_URI}/alerts/subscribe`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fcmToken, alerts }),
-    });
-  } catch (error) {
-    console.error("Failed to sync alerts to backend:", error);
+  const response = await fetch(`${BACKEND_URI}/alerts/subscribe`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fcmToken, alerts }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to sync alerts: ${response.status}`);
   }
 }
 
-export function useAlertPreferences(fcmToken?: string | null) {
-  const [alerts, setAlerts] = useLocalStorage<AlertPreference[]>(
-    "weather-app-alerts",
-    []
-  );
+function getPersistedAlertsHash(fcmToken: string): string | null {
+  const inMemoryHash = lastSyncedAlertsByToken.get(fcmToken);
+  if (inMemoryHash) return inMemoryHash;
+
+  if (typeof window === "undefined") return null;
+
+  return window.localStorage.getItem(getAlertPreferencesSyncStorageKey(fcmToken));
+}
+
+function persistAlertsHash(fcmToken: string, hash: string) {
+  lastSyncedAlertsByToken.set(fcmToken, hash);
+
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(getAlertPreferencesSyncStorageKey(fcmToken), hash);
+}
+
+export function useAlertPreferences(
+  fcmToken?: string | null
+): AlertPreferencesControls {
+  const [alerts, setAlerts, alertsHydrated, hasStoredAlerts] =
+    useLocalStorage<AlertPreference[]>(
+      "weather-app-alerts",
+      []
+    );
+  const alertsHash = useMemo(() => JSON.stringify(alerts), [alerts]);
 
   useEffect(() => {
-    if (!fcmToken) return;
-    syncAlertsToBackend(alerts, fcmToken);
-  }, [alerts, fcmToken]);
+    if (!fcmToken || !alertsHydrated) return;
+    if (!hasStoredAlerts && alerts.length === 0) return;
+    if (getPersistedAlertsHash(fcmToken) === alertsHash) return;
+
+    const timeoutId = window.setTimeout(() => {
+      syncAlertsToBackend(alerts, fcmToken)
+        .then(() => persistAlertsHash(fcmToken, alertsHash))
+        .catch((error) => {
+          console.error("Failed to sync alerts to backend:", error);
+        });
+    }, ALERT_SYNC_DEBOUNCE_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [alerts, alertsHash, alertsHydrated, fcmToken, hasStoredAlerts]);
 
   const addAlert = useCallback(
     (alert: Omit<AlertPreference, "id">) => {
@@ -143,5 +189,13 @@ export function useAlertPreferences(fcmToken?: string | null) {
     [alerts]
   );
 
-  return { alerts, addAlert, updateAlert, removeAlert, toggleAlert, checkAlerts };
+  return {
+    alerts,
+    alertsHydrated,
+    addAlert,
+    updateAlert,
+    removeAlert,
+    toggleAlert,
+    checkAlerts,
+  };
 }

@@ -18,7 +18,8 @@ const WeatherApp = ({
 }) => {
   const { weather } = useContext(WeatherContext);
   const { period } = useContext(PeriodContext);
-  const { latestMessage, clearLatestMessage } = useNotifications();
+  const notifications = useNotifications();
+  const { latestMessage, clearLatestMessage } = notifications;
   const { language } = useLanguage();
 
   return (
@@ -49,6 +50,7 @@ const WeatherApp = ({
             location={location ?? "toronto"}
             units={units ?? "metric"}
             defaultLocation="Toronto"
+            notificationControls={notifications}
           />
           <NetworkStatusBanner />
         </div>

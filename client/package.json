@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:guest": "next dev -p 3000",
+    "clean": "node -e \"const fs=require('fs'); ['.next', '.next-dev'].forEach((dir)=>fs.rmSync(dir,{recursive:true,force:true}));\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

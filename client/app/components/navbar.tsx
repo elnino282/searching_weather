@@ -1,6 +1,12 @@
 "use client";
 import React, { useState } from "react";
-import { IoClose, IoMenu, IoStar } from "react-icons/io5";
+import {
+  IoClose,
+  IoLogOutOutline,
+  IoMenu,
+  IoSettingsOutline,
+  IoStar,
+} from "react-icons/io5";
 import { ImLocation } from "react-icons/im";
 import SearchBar from "./search-bar";
 import Toggle from "./toggle";
@@ -10,6 +16,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { formatStringToPath } from "@/app/utils/utility-functions";
 import LanguageToggle from "./language-toggle";
 import { useLanguage } from "@/app/context/language-provider";
+import { useAuth } from "@/app/context/auth-provider";
 
 const Navbar = () => {
   const [showing, setShowing] = useState<boolean>(false);
@@ -17,6 +24,7 @@ const Navbar = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { language } = useLanguage();
+  const { role, logout } = useAuth();
 
   const handleNavigate = (city: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -68,6 +76,35 @@ const Navbar = () => {
           onClick={(event) => event.stopPropagation()}
         >
           <SearchBar onSubmit={() => setShowing(false)} />
+          <div className="mobile-session-controls">
+            <span className={`role-badge ${role ?? "guest"}`}>
+              {role === "admin" ? "Admin" : "Guest"}
+            </span>
+            {role === "admin" && (
+              <button
+                type="button"
+                className="session-action"
+                onClick={() => {
+                  router.push("/admin");
+                  setShowing(false);
+                }}
+              >
+                <IoSettingsOutline />
+                Admin
+              </button>
+            )}
+            <button
+              type="button"
+              className="session-action logout"
+              onClick={() => {
+                void logout();
+                setShowing(false);
+              }}
+            >
+              <IoLogOutOutline />
+              {language === "vi" ? "Đăng xuất" : "Logout"}
+            </button>
+          </div>
           {favorites.length > 0 && (
             <div className="mobile-favorites">
               <p className="mobile-favorites-title">

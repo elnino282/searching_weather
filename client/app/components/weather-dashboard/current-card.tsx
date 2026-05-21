@@ -25,6 +25,7 @@ import { useLanguage } from "@/app/context/language-provider";
 const CurrentCard = ({
   weatherData,
   units,
+  aqiEnabled,
 }: {
   weatherData: WeatherDataResponse;
   units: {
@@ -34,6 +35,7 @@ const CurrentCard = ({
     distanceMultiplier: number;
     speedMultiplier: number;
   };
+  aqiEnabled: boolean;
 }) => {
   const {
     speedUnit,
@@ -53,6 +55,7 @@ const CurrentCard = ({
   const heroBackgroundImage = hasValidImageUrl
     ? `linear-gradient(135deg, var(--background-color-1), var(--background-color-2)), url(${weatherData.imageUrl})`
     : "linear-gradient(135deg, var(--background-color-1), var(--background-color-2))";
+  const airQuality = weatherData?.list?.[0];
 
   useEffect(() => {
     const newPeriod = checkIfDay(
@@ -90,7 +93,7 @@ const CurrentCard = ({
       className="current-forecast-container"
       style={{
         "--wind-direction": weatherData?.current.wind_deg + "deg",
-      }}
+      } as React.CSSProperties}
     >
       <article
         className="main-container"
@@ -212,27 +215,37 @@ const CurrentCard = ({
           </div>
         </div>
 
-        <div className="metric-card aqi-container">
+        {aqiEnabled && (
+          <div className="metric-card aqi-container">
           <div className="aqi-header">
             <p className="title">
               <MdAir />
               {language === "vi" ? "Chỉ số chất lượng không khí" : "Air quality index"}
             </p>
-            <p className="info aqi-score">{weatherData?.list[0].main.aqi}</p>
+            <p className="info aqi-score">{airQuality?.main?.aqi ?? "N/A"}</p>
           </div>
-          <div className="aqi-data-container">
-            {Object.keys(weatherData?.list[0].components).map((key) => (
-              <div key={key} className="chemical-info-container">
-                <strong className="chemical info">
-                  {weatherData?.list[0].components[key]}
-                </strong>
-                <p className="label">
-                  {formatChemicalFormula(removeAfterHyphen(key.toUpperCase()))}
-                </p>
+            {airQuality?.components ? (
+              <div className="aqi-data-container">
+                {Object.keys(airQuality.components).map((key) => (
+                  <div key={key} className="chemical-info-container">
+                    <strong className="chemical info">
+                      {airQuality.components[key]}
+                    </strong>
+                    <p className="label">
+                      {formatChemicalFormula(removeAfterHyphen(key.toUpperCase()))}
+                    </p>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <p className="aqi-unavailable">
+                {language === "vi"
+                  ? "Du lieu AQI hien chua kha dung."
+                  : "AQI data is not available right now."}
+              </p>
+            )}
           </div>
-        </div>
+        )}
       </article>
     </section>
   );

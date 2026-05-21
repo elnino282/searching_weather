@@ -1,21 +1,25 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import SearchBar from "./search-bar";
 import Toggle from "./toggle";
 import { useMediaQueries } from "../hooks/useMediaQueries";
 import Navbar from "./navbar";
 import { TiWeatherPartlySunny } from "react-icons/ti";
-import { IoStar } from "react-icons/io5";
+import { IoLogOutOutline, IoSettingsOutline, IoStar } from "react-icons/io5";
 import { useFavorites } from "@/app/hooks/useFavorites";
 import FavoritesPanel from "./favorites/favorites-panel";
 import LanguageToggle from "./language-toggle";
 import { useLanguage } from "@/app/context/language-provider";
+import { useAuth } from "@/app/context/auth-provider";
 
 const Header = () => {
+  const router = useRouter();
   const device = useMediaQueries();
   const [showFavorites, setShowFavorites] = useState(false);
   const { favorites } = useFavorites();
   const { language } = useLanguage();
+  const { role, logout } = useAuth();
 
   if (device < 4) {
     return <Navbar />;
@@ -39,6 +43,31 @@ const Header = () => {
             </p>
           </div>
           <div className="right-side">
+            <div className="session-controls">
+              <span className={`role-badge ${role ?? "guest"}`}>
+                {role === "admin" ? "Admin" : "Guest"}
+              </span>
+              {role === "admin" && (
+                <button
+                  type="button"
+                  className="session-action"
+                  onClick={() => router.push("/admin")}
+                >
+                  <IoSettingsOutline />
+                  Trung tâm điều khiển
+                </button>
+              )}
+              <button
+                type="button"
+                className="session-action logout"
+                onClick={() => {
+                  void logout();
+                }}
+              >
+                <IoLogOutOutline />
+                {language === "vi" ? "Đăng xuất" : "Logout"}
+              </button>
+            </div>
             <div className="favorites-trigger-wrapper">
               <button
                 type="button"

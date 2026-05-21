@@ -1,5 +1,7 @@
 import React from "react";
-import WeatherApp from "./components/weather-app";
+import AuthGate from "./components/auth/auth-gate";
+import AuthProvider from "./context/auth-provider";
+import FeatureFlagsProvider from "./context/feature-flags-provider";
 import WeatherContextProvider from "./context/weather-provider";
 import PeriodContextProvider from "./context/period-provider";
 import LanguageContextProvider from "./context/language-provider";
@@ -15,7 +17,11 @@ const WeatherPage = async ({
       <WeatherContextProvider>
         <PeriodContextProvider>
           <LanguageContextProvider>
-            <WeatherApp units={units} location={location} />
+            <FeatureFlagsProvider>
+              <AuthProvider>
+                <AuthGate units={units} location={location} />
+              </AuthProvider>
+            </FeatureFlagsProvider>
           </LanguageContextProvider>
         </PeriodContextProvider>
       </WeatherContextProvider>
