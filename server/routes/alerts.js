@@ -7,6 +7,9 @@ const {
 } = require("../lib/firebase-admin");
 
 const SUBSCRIPTIONS_COLLECTION = "subscriptions";
+const ALERT_METRICS = new Set(["temp", "wind", "precipitation"]);
+const ALERT_COMPARATORS = new Set(["above", "below"]);
+const ALERT_UNITS = new Set(["metric", "imperial"]);
 
 function ensureFirebaseReady(res) {
   if (isFirebaseAdminReady && db) return true;
@@ -53,6 +56,48 @@ function getUserAgent(req) {
     : null;
 }
 
+function validateAlertPreferences(alerts) {
+  if (!Array.isArray(alerts)) {
+    return "alerts must be an array";
+  }
+
+  for (const [index, alert] of alerts.entries()) {
+    if (!alert || typeof alert !== "object") {
+      return `alerts[${index}] must be an object`;
+    }
+
+    if (typeof alert.id !== "string" || !alert.id.trim()) {
+      return `alerts[${index}].id is required`;
+    }
+
+    if (typeof alert.enabled !== "boolean") {
+      return `alerts[${index}].enabled must be a boolean`;
+    }
+
+    if (!ALERT_METRICS.has(alert.metric)) {
+      return `alerts[${index}].metric is invalid`;
+    }
+
+    if (!ALERT_COMPARATORS.has(alert.comparator)) {
+      return `alerts[${index}].comparator is invalid`;
+    }
+
+    if (typeof alert.location !== "string" || !alert.location.trim()) {
+      return `alerts[${index}].location is required`;
+    }
+
+    if (!ALERT_UNITS.has(alert.units)) {
+      return `alerts[${index}].units is invalid`;
+    }
+
+    if (typeof alert.threshold !== "number" || !Number.isFinite(alert.threshold)) {
+      return `alerts[${index}].threshold must be a finite number`;
+    }
+  }
+
+  return null;
+}
+
 /**
  * POST /api/alerts/subscribe
  * Register or update a device's alert subscriptions.
@@ -71,8 +116,11 @@ router.post("/subscribe", async (req, res) => {
       return res.status(400).json({ error: "fcmToken is required" });
     }
 
-    if (hasAlerts && !Array.isArray(alerts)) {
-      return res.status(400).json({ error: "alerts must be an array" });
+    if (hasAlerts) {
+      const alertsValidationError = validateAlertPreferences(alerts);
+      if (alertsValidationError) {
+        return res.status(400).json({ error: alertsValidationError });
+      }
     }
 
     // Use fcmToken as document ID for easy lookup & upsert

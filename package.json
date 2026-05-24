@@ -1,0 +1,11 @@
+{
+  "name": "weaclifor-workspace",
+  "private": true,
+  "scripts": {
+    "test:server": "npm --prefix server test",
+    "test:client": "npm --prefix client test",
+    "test:e2e": "npm --prefix client run test:e2e",
+    "test:coverage": "npm --prefix server run test:coverage && npm --prefix client run test:coverage",
+    "test:all": "npm run test:server && npm run test:client && npm run test:e2e"
+  }
+}

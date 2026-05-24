@@ -81,17 +81,21 @@ async function fetchWeatherData(cityName, units = "metric") {
 
     let airPollutionInfo = {};
     if (await isAqiEnabled()) {
-      const airPollutionUrl = buildOpenWeatherUrl(
-        "http://api.openweathermap.org/data/2.5/air_pollution",
-        {
-          lat,
-          lon,
-          units: "Metric",
-          appid: weatherKey,
-        }
-      );
-      const { data } = await fetchOpenWeatherJson(airPollutionUrl, "air_pollution");
-      airPollutionInfo = data || {};
+      try {
+        const airPollutionUrl = buildOpenWeatherUrl(
+          "http://api.openweathermap.org/data/2.5/air_pollution",
+          {
+            lat,
+            lon,
+            units: "Metric",
+            appid: weatherKey,
+          }
+        );
+        const { data } = await fetchOpenWeatherJson(airPollutionUrl, "air_pollution");
+        airPollutionInfo = data || {};
+      } catch (aqiError) {
+        console.warn(`[WeatherService] AQI request failed: ${aqiError.message}`);
+      }
     }
 
     return { ...weatherData, ...airPollutionInfo, ...cityInfo[0] };

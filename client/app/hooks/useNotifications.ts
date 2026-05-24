@@ -421,6 +421,7 @@ export function useNotifications(): UseNotificationsResult {
     const setupForegroundListener = async () => {
       if (
         typeof window === "undefined" ||
+        !("Notification" in window) ||
         Notification.permission !== "granted" ||
         !pushEnabled
       ) {
