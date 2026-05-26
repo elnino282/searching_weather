@@ -7,6 +7,10 @@ const {
 const router = express.Router();
 const HEARTBEAT_INTERVAL_MS = 25 * 1000;
 
+function isConfigStreamEnabled() {
+  return process.env.CONFIG_STREAM_ENABLED !== "false";
+}
+
 function sendSseEvent(res, eventName, payload) {
   res.write(`event: ${eventName}\n`);
   res.write(`data: ${JSON.stringify(payload)}\n\n`);
@@ -18,6 +22,10 @@ router.get("/public", async (_req, res) => {
 });
 
 router.get("/stream", async (req, res) => {
+  if (!isConfigStreamEnabled()) {
+    return res.status(404).json({ error: "Config stream is disabled." });
+  }
+
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache, no-transform");
   res.setHeader("Connection", "keep-alive");

@@ -1,0 +1,6 @@
+.env
+.env.*
+serviceAccountKey.json
+coverage/
+tests/
+*.log

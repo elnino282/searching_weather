@@ -28,6 +28,10 @@ const DEFAULT_FEATURES: FeatureFlags = {
 };
 const BACKEND_URI =
   process.env.NEXT_PUBLIC_BACKEND_URI ?? "http://localhost:4000/api";
+const CONFIG_STREAM_ENABLED =
+  process.env.NEXT_PUBLIC_CONFIG_STREAM_ENABLED === "true" ||
+  (process.env.NODE_ENV !== "production" &&
+    process.env.NEXT_PUBLIC_CONFIG_STREAM_ENABLED !== "false");
 const POLLING_INTERVAL_MS = 30 * 1000;
 
 const FeatureFlagsContext = createContext<FeatureFlagsContextType>({
@@ -54,7 +58,7 @@ export default function FeatureFlagsProvider({
 }) {
   const [features, setFeatures] = useState<FeatureFlags>(DEFAULT_FEATURES);
   const [loading, setLoading] = useState(true);
-  const [sseFailed, setSseFailed] = useState(false);
+  const [pollingEnabled, setPollingEnabled] = useState(!CONFIG_STREAM_ENABLED);
 
   const applyConfig = useCallback((config: Partial<PublicConfig> | null) => {
     const normalized = normalizeConfig(config);
@@ -99,8 +103,13 @@ export default function FeatureFlagsProvider({
   }, [refresh]);
 
   useEffect(() => {
+    if (!CONFIG_STREAM_ENABLED) {
+      setPollingEnabled(true);
+      return;
+    }
+
     if (typeof window === "undefined" || typeof EventSource === "undefined") {
-      setSseFailed(true);
+      setPollingEnabled(true);
       return;
     }
 
@@ -111,15 +120,15 @@ export default function FeatureFlagsProvider({
     const handleConfig = (event: MessageEvent<string>) => {
       try {
         applyConfig(JSON.parse(event.data) as PublicConfig);
-        setSseFailed(false);
+        setPollingEnabled(false);
       } catch (error) {
         console.error("Invalid feature config event:", error);
       }
     };
 
     eventSource.addEventListener("config", handleConfig);
-    eventSource.onopen = () => setSseFailed(false);
-    eventSource.onerror = () => setSseFailed(true);
+    eventSource.onopen = () => setPollingEnabled(false);
+    eventSource.onerror = () => setPollingEnabled(true);
 
     return () => {
       eventSource.removeEventListener("config", handleConfig);
@@ -128,7 +137,7 @@ export default function FeatureFlagsProvider({
   }, [applyConfig]);
 
   useEffect(() => {
-    if (!sseFailed) return;
+    if (!pollingEnabled) return;
 
     const interval = window.setInterval(() => {
       refresh().catch((error) => {
@@ -137,7 +146,7 @@ export default function FeatureFlagsProvider({
     }, POLLING_INTERVAL_MS);
 
     return () => window.clearInterval(interval);
-  }, [refresh, sseFailed]);
+  }, [refresh, pollingEnabled]);
 
   const value = useMemo(
     () => ({

@@ -1,0 +1,132 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Weaclifor API and scheduled weather alert workers.
+
+Parameters:
+  AppOrigin:
+    Type: String
+    Description: Exact frontend origin allowed to call the API, for example https://app.example.com.
+    AllowedPattern: "^https://.+"
+  ApiDomainName:
+    Type: String
+    Description: Custom API domain name, for example api.example.com.
+  ApiCertificateArn:
+    Type: String
+    Description: ACM certificate ARN for ApiDomainName in the same region as this stack.
+  HostedZoneId:
+    Type: AWS::Route53::HostedZone::Id
+    Description: Route53 hosted zone ID for the root domain.
+  AppSecretName:
+    Type: String
+    Default: weaclifor/prod/app
+    Description: Secrets Manager secret containing OPEN_WEATHER_API_KEY, GOOGLE_PLACES_API_KEY, ADMIN_PASSWORD, and ADMIN_SESSION_SECRET.
+  FirebaseServiceAccountSecretName:
+    Type: String
+    Default: weaclifor/prod/firebaseServiceAccount
+    Description: Secrets Manager secret whose SecretString is the Firebase service account JSON.
+  OpenWeatherDailyQuotaLimit:
+    Type: Number
+    Default: 1000
+    MinValue: 1
+    Description: Server-side daily OpenWeather quota guard.
+  AlertScheduleExpression:
+    Type: String
+    Default: rate(15 minutes)
+    Description: EventBridge schedule expression for checking saved weather alerts.
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        NODE_ENV: production
+        CORS_ORIGIN: !Ref AppOrigin
+        CLIENT_ORIGIN: !Ref AppOrigin
+        CONFIG_STREAM_ENABLED: "false"
+        OPENWEATHER_DAILY_QUOTA_LIMIT: !Sub "${OpenWeatherDailyQuotaLimit}"
+        OPEN_WEATHER_API_KEY: !Sub "{{resolve:secretsmanager:${AppSecretName}:SecretString:OPEN_WEATHER_API_KEY}}"
+        GOOGLE_PLACES_API_KEY: !Sub "{{resolve:secretsmanager:${AppSecretName}:SecretString:GOOGLE_PLACES_API_KEY}}"
+        ADMIN_PASSWORD: !Sub "{{resolve:secretsmanager:${AppSecretName}:SecretString:ADMIN_PASSWORD}}"
+        ADMIN_SESSION_SECRET: !Sub "{{resolve:secretsmanager:${AppSecretName}:SecretString:ADMIN_SESSION_SECRET}}"
+        FIREBASE_SERVICE_ACCOUNT: !Sub "{{resolve:secretsmanager:${FirebaseServiceAccountSecretName}:SecretString}}"
+
+Resources:
+  WeatherHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: "$default"
+      CorsConfiguration:
+        AllowCredentials: true
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+          - Cookie
+        AllowMethods:
+          - GET
+          - POST
+          - PATCH
+          - DELETE
+          - OPTIONS
+        AllowOrigins:
+          - !Ref AppOrigin
+        MaxAge: 600
+      Domain:
+        DomainName: !Ref ApiDomainName
+        CertificateArn: !Ref ApiCertificateArn
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId: !Ref HostedZoneId
+
+  WeatherApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: server/
+      Handler: lambda.apiHandler
+      Description: Express API for weather, auth, alerts, admin, and runtime config.
+      MemorySize: 512
+      Timeout: 30
+      Events:
+        ApiProxy:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref WeatherHttpApi
+            Path: /{proxy+}
+            Method: ANY
+            PayloadFormatVersion: "2.0"
+        ApiRoot:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref WeatherHttpApi
+            Path: /
+            Method: ANY
+            PayloadFormatVersion: "2.0"
+
+  AlertSchedulerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: server/
+      Handler: lambda.alertsHandler
+      Description: Scheduled worker that evaluates saved weather alerts and sends Firebase notifications.
+      MemorySize: 512
+      Timeout: 300
+      Events:
+        AlertSchedule:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: !Ref AlertScheduleExpression
+
+Outputs:
+  ApiCustomDomainUrl:
+    Description: Custom API base URL.
+    Value: !Sub "https://${ApiDomainName}"
+  ApiExecuteUrl:
+    Description: Regional execute-api URL for direct smoke tests.
+    Value: !Sub "https://${WeatherHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
+  WeatherApiFunctionName:
+    Description: Lambda function serving HTTP API requests.
+    Value: !Ref WeatherApiFunction
+  AlertSchedulerFunctionName:
+    Description: Lambda function invoked by EventBridge Scheduler.
+    Value: !Ref AlertSchedulerFunction
