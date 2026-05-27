@@ -1,0 +1,13 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "weaclifor-api"
+resolve_s3 = true
+s3_prefix = "weaclifor-api"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "AppOrigin=\"https://main.d1fzc08no3m4r8.amplifyapp.com\" AppSecretName=\"weaclifor/prod/app\" FirebaseServiceAccountSecretName=\"weaclifor/prod/firebaseServiceAccount\" OpenWeatherDailyQuotaLimit=\"1000\" AlertScheduleExpression=\"rate(15 minutes)\""
+image_repositories = []
+
+[default.global.parameters]
+region = "ap-southeast-1"

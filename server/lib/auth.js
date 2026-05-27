@@ -29,10 +29,12 @@ function getSessionSecret() {
 }
 
 function getCookieOptions() {
+  const isProduction = process.env.NODE_ENV === "production";
+
   return {
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction,
     maxAge: ADMIN_SESSION_MAX_AGE_MS,
     path: "/",
   };

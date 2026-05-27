@@ -5,17 +5,9 @@ Description: Weaclifor API and scheduled weather alert workers.
 Parameters:
   AppOrigin:
     Type: String
-    Description: Exact frontend origin allowed to call the API, for example https://app.example.com.
-    AllowedPattern: "^https://.+"
-  ApiDomainName:
-    Type: String
-    Description: Custom API domain name, for example api.example.com.
-  ApiCertificateArn:
-    Type: String
-    Description: ACM certificate ARN for ApiDomainName in the same region as this stack.
-  HostedZoneId:
-    Type: AWS::Route53::HostedZone::Id
-    Description: Route53 hosted zone ID for the root domain.
+    Description: Exact frontend origin allowed to call the API. Use http://localhost:3000 for the first backend deploy, then redeploy with the real Amplify default domain.
+    AllowedPattern: '^(http://localhost:3000|https://[A-Za-z0-9.-]+\.amplifyapp\.com)$'
+    ConstraintDescription: Must be http://localhost:3000 or an HTTPS Amplify default domain such as https://main.d1234567890abc.amplifyapp.com.
   AppSecretName:
     Type: String
     Default: weaclifor/prod/app
@@ -72,12 +64,6 @@ Resources:
         AllowOrigins:
           - !Ref AppOrigin
         MaxAge: 600
-      Domain:
-        DomainName: !Ref ApiDomainName
-        CertificateArn: !Ref ApiCertificateArn
-        EndpointConfiguration: REGIONAL
-        Route53:
-          HostedZoneId: !Ref HostedZoneId
 
   WeatherApiFunction:
     Type: AWS::Serverless::Function
@@ -118,11 +104,8 @@ Resources:
             ScheduleExpression: !Ref AlertScheduleExpression
 
 Outputs:
-  ApiCustomDomainUrl:
-    Description: Custom API base URL.
-    Value: !Sub "https://${ApiDomainName}"
   ApiExecuteUrl:
-    Description: Regional execute-api URL for direct smoke tests.
+    Description: Default API Gateway base URL.
     Value: !Sub "https://${WeatherHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
   WeatherApiFunctionName:
     Description: Lambda function serving HTTP API requests.

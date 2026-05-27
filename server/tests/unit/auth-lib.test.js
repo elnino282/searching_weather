@@ -28,6 +28,26 @@ describe("auth library", () => {
     );
   });
 
+  test("uses cross-site cookie settings in production", () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = "production";
+
+    try {
+      const res = createResponseDouble();
+      auth.signAdminSessionCookie(res);
+
+      const [, , options] = res.cookie.mock.calls[0];
+      expect(options).toEqual(
+        expect.objectContaining({
+          sameSite: "none",
+          secure: true,
+        })
+      );
+    } finally {
+      process.env.NODE_ENV = originalNodeEnv;
+    }
+  });
+
   test("rejects tampered session token", () => {
     const res = createResponseDouble();
     auth.signAdminSessionCookie(res);

@@ -1,1 +1,6 @@
+# AWS SAM build output
 .aws-sam/
+
+# Local Firebase Messaging service worker config
+# Contains project-specific Firebase Web SDK values.
+client/public/firebase-messaging-sw.js
