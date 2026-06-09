@@ -1,472 +1,423 @@
-# ☁️ WeCliFor – Weather & Climate Forecast App
+# 🌤️ WeCliFor — Website Tra Cứu Thời Tiết
 
-**WeCliFor** (Weather Climate Forecast) là ứng dụng tra cứu thời tiết hiện đại, hỗ trợ PWA, đa ngôn ngữ (Tiếng Việt / English), với hệ thống cảnh báo thời tiết thông minh qua push notification.
+<div align="center">
 
-## 📑 Mục lục
+**WeCliFor** (Weather · Climate · Forecast) là một ứng dụng web tra cứu thời tiết hiện đại, hỗ trợ người dùng xem dự báo thời tiết theo thời gian thực với giao diện đẹp mắt và đầy đủ tính năng.
 
-- [Tổng quan kiến trúc](#-tổng-quan-kiến-trúc)
-- [Tính năng chính](#-tính-năng-chính)
-- [Yêu cầu hệ thống](#-yêu-cầu-hệ-thống)
-- [Cài đặt và chạy Local](#-cài-đặt-và-chạy-local)
-  - [1. Clone repository](#1-clone-repository)
-  - [2. Cài đặt Backend (Server)](#2-cài-đặt-backend-server)
-  - [3. Cài đặt Frontend (Client)](#3-cài-đặt-frontend-client)
-  - [4. Chạy đồng thời Client & Server](#4-chạy-đồng-thời-client--server)
-- [Cấu hình Firebase (Tùy chọn)](#-cấu-hình-firebase-tùy-chọn)
-- [Triển khai lên AWS (Production)](#-triển-khai-lên-aws-production)
-- [Tham chiếu biến môi trường](#-tham-chiếu-biến-môi-trường)
-- [API Reference](#-api-reference)
-- [Kiểm thử](#-kiểm-thử)
-- [Cấu trúc dự án](#-cấu-trúc-dự-án)
-- [Xử lý sự cố](#-xử-lý-sự-cố)
+[![Test](https://github.com/elnino282/searching_weather/actions/workflows/test.yml/badge.svg)](https://github.com/elnino282/searching_weather/actions/workflows/test.yml)
+
+</div>
 
 ---
 
-## 🏗 Tổng quan kiến trúc
+## 📋 Mục Lục
+
+- [Tổng Quan](#-tổng-quan)
+- [Tính Năng](#-tính-năng)
+- [Công Nghệ Sử Dụng](#-công-nghệ-sử-dụng)
+- [Kiến Trúc Hệ Thống](#-kiến-trúc-hệ-thống)
+- [Cấu Trúc Thư Mục](#-cấu-trúc-thư-mục)
+- [Yêu Cầu Hệ Thống](#-yêu-cầu-hệ-thống)
+- [Hướng Dẫn Cài Đặt](#-hướng-dẫn-cài-đặt)
+- [Biến Môi Trường](#-biến-môi-trường)
+- [Chạy Ứng Dụng](#-chạy-ứng-dụng)
+- [Testing](#-testing)
+- [Triển Khai (Deployment)](#-triển-khai-deployment)
+- [API Endpoints](#-api-endpoints)
+- [Đóng Góp](#-đóng-góp)
+- [Giấy Phép](#-giấy-phép)
+
+---
+
+## 🌍 Tổng Quan
+
+WeCliFor là ứng dụng full-stack tra cứu thời tiết, cung cấp thông tin thời tiết hiện tại, dự báo theo giờ và theo ngày cho bất kỳ địa điểm nào trên thế giới. Ứng dụng được xây dựng theo kiến trúc **client-server** tách biệt, hỗ trợ PWA (Progressive Web App) và push notification thông qua Firebase.
+
+### Điểm nổi bật
+
+- 🔍 Tra cứu thời tiết theo tên thành phố với autocomplete (Google Places API)
+- 📊 Dashboard trực quan với biểu đồ nhiệt độ theo giờ
+- 🔔 Hệ thống cảnh báo thời tiết thông minh (push notification)
+- 🌐 Hỗ trợ đa ngôn ngữ (Tiếng Việt / English)
+- 📱 Thiết kế responsive, hỗ trợ PWA — có thể cài đặt như ứng dụng native
+- 🛡️ Trang quản trị (Admin) với hệ thống xác thực và cấu hình runtime
+
+---
+
+## ✨ Tính Năng
+
+### Người dùng
+
+| Tính năng | Mô tả |
+|---|---|
+| **Tra cứu thời tiết** | Tìm kiếm thời tiết theo tên địa điểm, hỗ trợ cả metric (°C) và imperial (°F) |
+| **Thời tiết hiện tại** | Hiển thị nhiệt độ, độ ẩm, tốc độ gió, áp suất, tầm nhìn, v.v. |
+| **Dự báo theo giờ** | Biểu đồ đường (line graph) hiển thị xu hướng nhiệt độ trong 24–48 giờ tới |
+| **Dự báo theo ngày** | Thời tiết dự báo cho 7 ngày tiếp theo |
+| **Danh sách yêu thích** | Lưu các thành phố yêu thích để tra cứu nhanh |
+| **Cảnh báo thời tiết** | Thiết lập cảnh báo tùy chỉnh (nhiệt độ, mưa, gió…) và nhận push notification |
+| **Gợi ý hoạt động** | Đề xuất hoạt động phù hợp dựa trên điều kiện thời tiết |
+| **Tìm thời điểm hoạt động** | Tìm khung giờ tốt nhất cho hoạt động ngoài trời |
+| **Chia sẻ ảnh thời tiết** | Tạo snapshot thời tiết để chia sẻ lên mạng xã hội |
+| **Chuyển đổi ngôn ngữ** | Hỗ trợ Tiếng Việt và Tiếng Anh |
+| **Chế độ sáng/tối** | Toggle giữa giao diện sáng và tối |
+| **PWA** | Cài đặt ứng dụng trên thiết bị, hoạt động offline cơ bản |
+
+### Quản trị viên
+
+| Tính năng | Mô tả |
+|---|---|
+| **Dashboard quản trị** | Theo dõi metrics API, audit log, và cấu hình hệ thống |
+| **Runtime config** | Thay đổi cấu hình ứng dụng mà không cần redeploy |
+| **Quota management** | Giám sát và giới hạn quota API OpenWeather hàng ngày |
+| **Feature flags** | Bật/tắt tính năng từ xa qua cấu hình runtime |
+
+---
+
+## 🛠️ Công Nghệ Sử Dụng
+
+### Frontend (Client)
+
+| Công nghệ | Phiên bản | Mục đích |
+|---|---|---|
+| **Next.js** | 15.x | React framework với SSR/SSG |
+| **React** | 19.x | UI library |
+| **TypeScript** | 5.x | Type-safe JavaScript |
+| **SCSS (Sass)** | 1.x | Styling nâng cao |
+| **Firebase** | 12.x | Push notification (FCM) |
+| **React Icons** | 5.x | Thư viện icon |
+
+### Backend (Server)
+
+| Công nghệ | Phiên bản | Mục đích |
+|---|---|---|
+| **Node.js** | 20+ / 22 | Runtime |
+| **Express.js** | 4.x | Web framework |
+| **Firebase Admin** | 13.x | Push notification server-side |
+| **Axios** | 1.x | HTTP client |
+| **serverless-http** | 3.x | Lambda adapter cho Express |
+| **node-cron** | 4.x | Scheduled tasks (local dev) |
+
+### Hạ tầng & DevOps
+
+| Công nghệ | Mục đích |
+|---|---|
+| **AWS SAM** | Infrastructure as Code — API Gateway + Lambda |
+| **AWS Lambda** | Serverless compute cho API và alert worker |
+| **AWS API Gateway (HTTP API)** | HTTP endpoint |
+| **AWS Secrets Manager** | Quản lý API keys và secrets |
+| **AWS Amplify** | Hosting frontend (Next.js SSR) |
+| **GitHub Actions** | CI/CD pipeline |
+
+### Testing
+
+| Công cụ | Mục đích |
+|---|---|
+| **Vitest** | Unit test cho frontend |
+| **Jest** | Unit & integration test cho backend |
+| **Playwright** | End-to-end (E2E) testing |
+| **Testing Library** | Component testing utilities |
+| **Supertest** | HTTP assertion cho Express |
+
+### API bên thứ ba
+
+| API | Mục đích |
+|---|---|
+| **OpenWeather API** | Dữ liệu thời tiết (current, hourly, daily) |
+| **Google Places API** | Autocomplete địa điểm |
+| **Firebase Cloud Messaging** | Push notification |
+
+---
+
+## 🏗️ Kiến Trúc Hệ Thống
 
 ```
-┌─────────────────────────┐         ┌─────────────────────────────┐
-│     Client (Next.js)    │  HTTP   │     Server (Express.js)     │
-│    AWS Amplify Hosting  │ ◄─────► │    AWS Lambda + API Gateway │
-│    Port: 3000 (dev)     │         │    Port: 4000 (dev)         │
-└─────────┬───────────────┘         └──────────┬──────────────────┘
-          │                                    │
-          │ Firebase SDK                       │ Firebase Admin SDK
-          ▼                                    ▼
-┌─────────────────────────┐         ┌──────────────────────┐
-│   Firebase Cloud        │         │   Firestore Database │
-│   Messaging (FCM)       │         │   (Subscriptions,    │
-│   Push Notifications    │         │    Runtime Config)    │
-└─────────────────────────┘         └──────────┬───────────┘
-                                               │
-                                    ┌──────────▼───────────┐
-                                    │  OpenWeather API     │
-                                    │  Google Places API   │
-                                    └──────────────────────┘
+┌─────────────────────┐     HTTPS      ┌──────────────────────────┐
+│                     │ ◄────────────►  │                          │
+│    Next.js Client   │                 │   AWS API Gateway (HTTP) │
+│   (AWS Amplify)     │                 │           │              │
+│                     │                 │           ▼              │
+└─────────────────────┘                 │    AWS Lambda (Express)  │
+         │                              │           │              │
+         │  FCM Push                    │     ┌─────┴──────┐       │
+         ▼                              │     ▼            ▼       │
+┌─────────────────────┐                 │ OpenWeather   Google     │
+│  Firebase Cloud     │ ◄───────────    │    API       Places API  │
+│  Messaging (FCM)    │    Send         │                          │
+└─────────────────────┘  Notification   └──────────────────────────┘
+                                                   ▲
+                                                   │ Schedule (15 min)
+                                        ┌──────────┴──────────┐
+                                        │  Alert Scheduler     │
+                                        │  (Lambda + EventBridge)│
+                                        └──────────────────────┘
 ```
 
-| Thành phần | Công nghệ | Mô tả |
-|---|---|---|
-| **Frontend** | Next.js 15, React 19, TypeScript, SCSS | Giao diện người dùng, PWA |
-| **Backend** | Express 4, Node.js, JavaScript | REST API, business logic |
-| **Database** | Firestore (NoSQL) | Lưu subscriptions, runtime config |
-| **Push Notification** | Firebase Cloud Messaging | Cảnh báo thời tiết real-time |
-| **Weather Data** | OpenWeather API (OneCall 3.0) | Dữ liệu thời tiết current/hourly/daily |
-| **Place Images** | Google Places API | Ảnh nền thành phố |
-| **Infrastructure** | AWS SAM, Lambda, API Gateway, Amplify, EventBridge | Serverless deployment |
-| **CI/CD** | GitHub Actions | Tự động chạy tests khi push/PR |
+---
+
+## 📁 Cấu Trúc Thư Mục
+
+```
+searching_weather/
+├── .github/
+│   └── workflows/
+│       └── test.yml                 # GitHub Actions CI pipeline
+├── client/                          # 🖥️ Frontend (Next.js)
+│   ├── app/
+│   │   ├── admin/                   # Trang quản trị
+│   │   ├── components/
+│   │   │   ├── activity-finder/     # Tìm khung giờ hoạt động
+│   │   │   ├── admin/               # Admin dashboard components
+│   │   │   ├── alerts/              # Cảnh báo thời tiết
+│   │   │   ├── auth/                # Xác thực (login, auth gate)
+│   │   │   ├── favorites/           # Danh sách yêu thích
+│   │   │   ├── pwa/                 # PWA network status banner
+│   │   │   ├── recommendations/     # Gợi ý hoạt động
+│   │   │   ├── weather-dashboard/   # Dashboard chính (current, hourly, daily)
+│   │   │   ├── header.tsx           # Header component
+│   │   │   ├── navbar.tsx           # Navigation bar
+│   │   │   ├── search-bar.tsx       # Thanh tìm kiếm
+│   │   │   ├── toggle.tsx           # Unit toggle (°C/°F)
+│   │   │   ├── language-toggle.tsx  # Chuyển đổi ngôn ngữ
+│   │   │   ├── line-graph.tsx       # Biểu đồ nhiệt độ
+│   │   │   └── weather-app.tsx      # Component chính
+│   │   ├── context/                 # React Context providers
+│   │   │   ├── auth-provider.tsx
+│   │   │   ├── feature-flags-provider.tsx
+│   │   │   ├── language-provider.tsx
+│   │   │   ├── period-provider.tsx
+│   │   │   ├── pwa-provider.tsx
+│   │   │   ├── unit-provider.tsx
+│   │   │   └── weather-provider.tsx
+│   │   ├── hooks/                   # Custom React hooks
+│   │   ├── lib/                     # Firebase config, storage helpers
+│   │   ├── styles/                  # SCSS stylesheets
+│   │   ├── types/                   # TypeScript type definitions
+│   │   ├── utils/                   # Utility functions
+│   │   ├── layout.tsx               # Root layout
+│   │   └── page.tsx                 # Trang chính
+│   ├── public/                      # Static assets (icons, manifest, SW)
+│   ├── tests/
+│   │   ├── e2e/                     # Playwright E2E tests
+│   │   ├── unit/                    # Vitest unit tests
+│   │   └── setup/                   # Test setup files
+│   ├── next.config.ts
+│   ├── playwright.config.ts
+│   ├── vitest.config.ts
+│   ├── tsconfig.json
+│   └── package.json
+├── server/                          # ⚙️ Backend (Express.js)
+│   ├── lib/
+│   │   ├── api-metrics.js           # API quota tracking & metrics
+│   │   ├── audit-log.js             # Audit logging
+│   │   ├── auth.js                  # Authentication logic
+│   │   ├── firebase-admin.js        # Firebase Admin SDK setup
+│   │   ├── runtime-config.js        # Runtime configuration manager
+│   │   ├── weather-checker.js       # Alert subscription checker
+│   │   └── weather-service.js       # OpenWeather API integration
+│   ├── routes/
+│   │   ├── admin.js                 # Admin API routes
+│   │   ├── alerts.js                # Weather alert routes
+│   │   ├── auth.js                  # Auth routes
+│   │   └── config.js                # Config routes
+│   ├── tests/
+│   │   ├── unit/                    # Jest unit tests
+│   │   ├── integration/             # Integration tests
+│   │   ├── helpers/                 # Test helpers
+│   │   └── setup/                   # Test setup
+│   ├── index.js                     # Express app entry point
+│   ├── lambda.js                    # AWS Lambda handlers
+│   ├── .env.example                 # Mẫu biến môi trường
+│   └── package.json
+├── template.yaml                    # AWS SAM template (IaC)
+├── samconfig.toml                   # SAM deploy configuration
+├── amplify.yml                      # AWS Amplify build settings
+├── package.json                     # Root workspace scripts
+└── .gitignore
+```
 
 ---
 
-## ✨ Tính năng chính
+## 💻 Yêu Cầu Hệ Thống
 
-### Người dùng (Guest / User)
-
-- 🔍 **Tra cứu thời tiết** — Tìm kiếm theo tên thành phố với gợi ý tự động
-- 📊 **Dashboard đa dạng** — Thời tiết hiện tại, theo giờ (biểu đồ line graph), theo ngày
-- 🌡 **Chuyển đổi đơn vị** — Metric (°C, km/h) ↔ Imperial (°F, mph)
-- 🌏 **Đa ngôn ngữ** — Tiếng Việt / English, chuyển đổi tức thì
-- ⭐ **Yêu thích** — Lưu danh sách thành phố yêu thích (localStorage)
-- 🔔 **Cảnh báo thời tiết** — Thiết lập ngưỡng cảnh báo nhiệt độ, gió, mưa; nhận push notification
-- 💡 **Gợi ý hoạt động** — Đề xuất hoạt động phù hợp thời tiết (outdoor/indoor)
-- ⏰ **Tìm thời điểm tốt nhất** — Phân tích giờ tốt nhất cho các hoạt động ngoài trời
-- 📸 **Chia sẻ snapshot** — Chụp và chia sẻ hình ảnh thời tiết
-- 🌐 **PWA** — Cài đặt như app native, hoạt động offline cơ bản
-- 💨 **Chất lượng không khí (AQI)** — Hiển thị chỉ số chất lượng không khí (bật/tắt được)
-
-### Quản trị viên (Admin)
-
-- 🔐 **Đăng nhập admin** — Xác thực bằng password, session HMAC-SHA256
-- 📡 **Health check** — Trạng thái server, database, Firebase, API usage
-- ⚙️ **Feature flags** — Bật/tắt tính năng runtime (ví dụ: AQI)
-- 🔑 **Quản lý API key** — Xem, validate, cập nhật OpenWeather API key mà không cần redeploy
-- 📢 **Broadcast notification** — Gửi thông báo đến tất cả user đã đăng ký
-- 📋 **Audit log** — Ghi lại hành động admin
-- 📈 **API metrics** — Thống kê số lượng request, latency, quota usage
+- **Node.js** >= 20.x
+- **npm** >= 9.x
+- **AWS CLI** & **AWS SAM CLI** (cho deployment)
+- Tài khoản [OpenWeather](https://openweathermap.org/api) (API key)
+- Tài khoản [Google Cloud](https://console.cloud.google.com/) (Places API key)
+- Firebase project (cho push notification)
 
 ---
 
-## 📋 Yêu cầu hệ thống
-
-### Bắt buộc
-
-| Phần mềm | Phiên bản tối thiểu | Kiểm tra |
-|---|---|---|
-| **Node.js** | 20.x trở lên | `node -v` |
-| **npm** | 10.x trở lên | `npm -v` |
-| **Git** | 2.x trở lên | `git --version` |
-
-### API Keys cần đăng ký
-
-| API | Mục đích | Đăng ký |
-|---|---|---|
-| **OpenWeather API** | Dữ liệu thời tiết (bắt buộc) | [openweathermap.org](https://openweathermap.org/api) — cần gói **One Call API 3.0** |
-| **Google Places API** | Ảnh nền thành phố (tùy chọn) | [Google Cloud Console](https://console.cloud.google.com/) |
-
-### Tùy chọn (cho Push Notification & Alerts)
-
-| Phần mềm | Mục đích |
-|---|---|
-| **Firebase project** | Push notification, Firestore database |
-| **Firebase service account JSON** | Backend xác thực với Firebase Admin |
-| **VAPID key** | Web Push trên trình duyệt |
-
-### Tùy chọn (cho Production deployment)
-
-| Phần mềm | Mục đích |
-|---|---|
-| **AWS CLI** | Deploy lên AWS |
-| **AWS SAM CLI** | Build và deploy Lambda |
-
----
-
-## 🚀 Cài đặt và chạy Local
+## 🚀 Hướng Dẫn Cài Đặt
 
 ### 1. Clone repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/elnino282/searching_weather.git
 cd searching_weather
 ```
 
-### 2. Cài đặt Backend (Server)
+### 2. Cài đặt dependencies
 
 ```bash
-# Di chuyển vào thư mục server
+# Cài đặt dependencies cho server
 cd server
-
-# Cài đặt dependencies
 npm install
 
-# Tạo file cấu hình từ template
+# Cài đặt dependencies cho client
+cd ../client
+npm install
+```
+
+### 3. Cấu hình biến môi trường
+
+#### Server
+
+```bash
+cd server
 cp .env.example .env
 ```
 
-Mở file `server/.env` và điền các giá trị:
+Mở file `.env` và điền các giá trị:
 
-```ini
-# Server
+```env
 PORT=4000
 NODE_ENV=development
-
-# CORS — cho phép client kết nối
 CORS_ORIGIN=http://localhost:3000
-CLIENT_ORIGIN=http://localhost:3000
-
-# OpenWeather API (BẮT BUỘC)
-OPEN_WEATHER_API_KEY=your_openweather_api_key_here
-
-# Google Places API (TÙY CHỌN — bỏ trống nếu không dùng)
-GOOGLE_PLACES_API_KEY=
-
-# Giới hạn quota OpenWeather mỗi ngày
-OPENWEATHER_DAILY_QUOTA_LIMIT=1000
-
-# Admin auth (đặt password để đăng nhập admin)
+OPEN_WEATHER_API_KEY=your_openweather_api_key
+GOOGLE_PLACES_API_KEY=your_google_places_api_key
 ADMIN_PASSWORD=your_admin_password
-ADMIN_SESSION_SECRET=any_long_random_string_at_least_32_chars
-
-# Firebase Admin SDK (TÙY CHỌN — bỏ trống nếu không dùng notifications)
-FIREBASE_SERVICE_ACCOUNT=
+ADMIN_SESSION_SECRET=your_session_secret
 FIREBASE_SERVICE_ACCOUNT_PATH=./serviceAccountKey.json
-
-# Chu kỳ kiểm tra alert (phút)
-ALERT_CHECK_INTERVAL_MINUTES=60
 ```
 
-> [!IMPORTANT]
-> **Tối thiểu chỉ cần `OPEN_WEATHER_API_KEY`** để server hoạt động. Các tính năng Firebase (alerts, notifications, runtime config) sẽ tự động tắt nếu không cấu hình Firebase.
+#### Client
 
-Khởi động server:
+Tạo file `client/.env.local`:
 
-```bash
-npm run dev
-```
-
-Server sẽ chạy tại **http://localhost:4000**. Kiểm tra nhanh:
-
-```bash
-curl "http://localhost:4000/api?location=Hanoi&units=metric"
-```
-
-### 3. Cài đặt Frontend (Client)
-
-Mở **terminal mới** (giữ server đang chạy):
-
-```bash
-# Quay lại thư mục gốc nếu đang ở server/
-cd ../client
-
-# Cài đặt dependencies
-npm install
-```
-
-Tạo file `client/.env.local` với nội dung:
-
-```ini
-# Backend API URL (BẮT BUỘC)
+```env
 NEXT_PUBLIC_BACKEND_URI=http://localhost:4000/api
-
-# Config stream (tắt trong local development)
-NEXT_PUBLIC_CONFIG_STREAM_ENABLED=false
-
-# Firebase Web SDK (TÙY CHỌN — cần cho push notifications)
-NEXT_PUBLIC_FIREBASE_API_KEY=
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
-NEXT_PUBLIC_FIREBASE_APP_ID=
-NEXT_PUBLIC_FIREBASE_VAPID_KEY=
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+NEXT_PUBLIC_FIREBASE_VAPID_KEY=your_vapid_key
 ```
-
-> [!NOTE]
-> Nếu không cần push notification, chỉ cần đặt `NEXT_PUBLIC_BACKEND_URI`. Các biến Firebase bỏ trống thì tính năng notification sẽ tự động ẩn.
-
-Khởi động client:
-
-```bash
-npm run dev
-```
-
-Client sẽ chạy tại **http://localhost:3000**. Mở trình duyệt và truy cập URL này.
-
-### 4. Chạy đồng thời Client & Server
-
-Bạn cần **2 terminal** chạy song song:
-
-| Terminal | Thư mục | Lệnh | URL |
-|---|---|---|---|
-| Terminal 1 | `server/` | `npm run dev` | http://localhost:4000 |
-| Terminal 2 | `client/` | `npm run dev` | http://localhost:3000 |
 
 ---
 
-## 🔥 Cấu hình Firebase (Tùy chọn)
-
-Chỉ cần cấu hình nếu muốn sử dụng **push notification** và **weather alerts**.
-
-### Bước 1: Tạo Firebase Project
-
-1. Truy cập [Firebase Console](https://console.firebase.google.com/)
-2. Tạo project mới hoặc chọn project có sẵn
-3. Bật **Firestore Database** (chế độ Native)
-4. Bật **Cloud Messaging**
-
-### Bước 2: Lấy Web SDK Config
-
-1. Vào **Project Settings** → **General** → **Your apps**
-2. Thêm **Web app** nếu chưa có
-3. Copy các giá trị config vào `client/.env.local`:
-
-```ini
-NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSy...
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
-NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abcdef
-```
-
-### Bước 3: Tạo VAPID Key
-
-1. Vào **Project Settings** → **Cloud Messaging** → **Web configuration**
-2. Click **Generate key pair**
-3. Copy VAPID key vào `client/.env.local`:
-
-```ini
-NEXT_PUBLIC_FIREBASE_VAPID_KEY=BLk9...
-```
-
-### Bước 4: Tạo Firebase Messaging Service Worker
-
-File `client/public/firebase-messaging-sw.js` dùng cho background push notification và chứa Firebase Web SDK config của từng project. File này đã được thêm vào `.gitignore`, vì vậy không commit lên Git.
-
-Sau khi clone repo hoặc khi deploy frontend, tạo file `client/public/firebase-messaging-sw.js` trên môi trường tương ứng và điền config Firebase của bạn:
-
-```js
-/* eslint-disable no-undef */
-importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js");
-importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js");
-
-firebase.initializeApp({
-  apiKey: "your_firebase_api_key",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef",
-});
-
-const messaging = firebase.messaging();
-
-messaging.onBackgroundMessage((payload) => {
-  self.registration.showNotification(
-    payload.notification?.title ?? "Weather alert",
-    {
-      body: payload.notification?.body ?? "You have a new weather alert.",
-      icon: "/static/weather-icon.png",
-      badge: "/static/weather-icon.png",
-      tag: payload.data?.alertId ?? "weather-alert",
-      data: payload.data,
-    }
-  );
-});
-```
-
-> [!IMPORTANT]
-> Nếu API key/config này đã từng được commit hoặc push lên remote, hãy rotate/restrict key trong Firebase/Google Cloud Console trước khi deploy production.
-
-### Bước 5: Service Account cho Backend
-
-1. Vào **Project Settings** → **Service accounts**
-2. Click **Generate new private key**
-3. Lưu file JSON vào `server/serviceAccountKey.json`
-
-> [!CAUTION]
-> File `serviceAccountKey.json` chứa credentials nhạy cảm. **KHÔNG** commit file này lên Git. File đã được thêm vào `server/.gitignore`.
-
----
-
-## ☁️ Triển khai lên AWS (Production)
-
-Xem chi tiết tại [DEPLOYMENT.md](./DEPLOYMENT.md). Tóm tắt các bước:
-
-1. **Tạo Amplify app** từ Git repo (frontend)
-2. **Tạo AWS Secrets** trong Secrets Manager (`weaclifor/prod/app` và `weaclifor/prod/firebaseServiceAccount`)
-3. **Deploy backend** bằng AWS SAM (`sam build && sam deploy --guided`)
-4. **Cập nhật Amplify environment variables** với Backend API URL
-5. **Xác minh** — truy cập URL Amplify, tìm kiếm thành phố, test admin login
-
----
-
-## 📖 Tham chiếu biến môi trường
+## ⚙️ Biến Môi Trường
 
 ### Server (`server/.env`)
 
-| Biến | Bắt buộc | Mô tả | Giá trị mặc định |
-|---|:---:|---|---|
-| `PORT` | ❌ | Port chạy server | `4000` |
-| `NODE_ENV` | ❌ | Môi trường chạy | `development` |
-| `CORS_ORIGIN` | ❌ | Origin cho phép CORS (phân tách bằng dấu `,`) | Cho phép tất cả |
-| `CLIENT_ORIGIN` | ❌ | Fallback cho `CORS_ORIGIN` | — |
-| `OPEN_WEATHER_API_KEY` | ✅ | API key OpenWeather | — |
-| `GOOGLE_PLACES_API_KEY` | ❌ | API key Google Places (ảnh thành phố) | — |
-| `OPENWEATHER_DAILY_QUOTA_LIMIT` | ❌ | Giới hạn request/ngày | `1000` |
-| `ADMIN_PASSWORD` | ❌* | Mật khẩu admin login | — |
-| `ADMIN_SESSION_SECRET` | ❌* | Secret ký session token | Dev-only fallback |
-| `FIREBASE_SERVICE_ACCOUNT` | ❌ | JSON string service account | — |
-| `FIREBASE_SERVICE_ACCOUNT_PATH` | ❌ | Đường dẫn file service account | `./serviceAccountKey.json` |
-| `ALERT_CHECK_INTERVAL_MINUTES` | ❌ | Chu kỳ kiểm tra alert (phút) | `15` |
+| Biến | Bắt buộc | Mô tả |
+|---|---|---|
+| `PORT` | Không | Port chạy server (mặc định: `4000`) |
+| `NODE_ENV` | Không | Môi trường (`development` / `production`) |
+| `CORS_ORIGIN` | Không | Origin cho phép CORS (mặc định: cho phép tất cả) |
+| `OPEN_WEATHER_API_KEY` | ✅ | API key từ OpenWeather |
+| `GOOGLE_PLACES_API_KEY` | ✅ | API key từ Google Cloud (Places API) |
+| `OPENWEATHER_DAILY_QUOTA_LIMIT` | Không | Giới hạn số lần gọi API/ngày (mặc định: `1000`) |
+| `ADMIN_PASSWORD` | ✅ | Mật khẩu đăng nhập admin |
+| `ADMIN_SESSION_SECRET` | ✅ | Secret cho session admin |
+| `FIREBASE_SERVICE_ACCOUNT` | Có* | Firebase service account JSON (inline) |
+| `FIREBASE_SERVICE_ACCOUNT_PATH` | Có* | Đường dẫn file service account |
+| `ALERT_CHECK_INTERVAL_MINUTES` | Không | Chu kỳ kiểm tra cảnh báo (mặc định: `15` phút) |
 
-> \* Bắt buộc trong production (`NODE_ENV=production`)
+> *Cần ít nhất một trong hai biến Firebase.
 
 ### Client (`client/.env.local`)
 
 | Biến | Bắt buộc | Mô tả |
-|---|:---:|---|
-| `NEXT_PUBLIC_BACKEND_URI` | ✅ | URL backend API (ví dụ: `http://localhost:4000/api`) |
-| `NEXT_PUBLIC_CONFIG_STREAM_ENABLED` | ❌ | Bật SSE config stream (`true`/`false`) |
-| `NEXT_PUBLIC_FIREBASE_API_KEY` | ❌ | Firebase Web API Key |
-| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | ❌ | Firebase Auth Domain |
-| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | ❌ | Firebase Project ID |
-| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | ❌ | Firebase Storage Bucket |
-| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | ❌ | Firebase Messaging Sender ID |
-| `NEXT_PUBLIC_FIREBASE_APP_ID` | ❌ | Firebase App ID |
-| `NEXT_PUBLIC_FIREBASE_VAPID_KEY` | ❌ | Firebase Web Push VAPID Key |
-
----
-
-## 📡 API Reference
-
-Base URL: `http://localhost:4000` (development) hoặc `https://<api-id>.execute-api.<region>.amazonaws.com` (production)
-
-### Public Endpoints
-
-| Method | Endpoint | Mô tả | Parameters |
-|---|---|---|---|
-| `GET` | `/api?location=<city>&units=<metric\|imperial>` | Tra cứu thời tiết | `location` (bắt buộc), `units` (mặc định: `metric`) |
-| `GET` | `/api/config/public` | Lấy config công khai (feature flags) | — |
-| `GET` | `/api/config/stream` | SSE stream config thay đổi | — |
-
-### Auth Endpoints
-
-| Method | Endpoint | Mô tả | Body |
-|---|---|---|---|
-| `POST` | `/api/auth/login` | Đăng nhập | `{ "role": "admin", "password": "..." }` hoặc `{ "role": "guest" }` |
-| `POST` | `/api/auth/logout` | Đăng xuất | — |
-| `GET` | `/api/auth/me` | Kiểm tra session hiện tại | — |
-
-### Alert Endpoints
-
-| Method | Endpoint | Mô tả | Body |
-|---|---|---|---|
-| `POST` | `/api/alerts/subscribe` | Đăng ký / cập nhật alert | `{ "fcmToken": "...", "alerts": [...] }` |
-| `GET` | `/api/alerts/subscribe/:token` | Lấy alert preferences | — |
-| `DELETE` | `/api/alerts/subscribe` | Xóa subscription | `{ "fcmToken": "..." }` |
-
-### Admin Endpoints (yêu cầu session admin)
-
-| Method | Endpoint | Mô tả |
 |---|---|---|
-| `GET` | `/api/admin/me` | Xác minh quyền admin |
-| `GET` | `/api/admin/health` | Health check tổng hợp |
-| `GET` | `/api/admin/config` | Lấy config hiện tại |
-| `PATCH` | `/api/admin/config/features` | Cập nhật feature flags |
-| `GET` | `/api/admin/openweather-key` | Thông tin API key (masked) |
-| `POST` | `/api/admin/openweather-key` | Cập nhật API key |
-| `POST` | `/api/admin/broadcast` | Gửi broadcast notification |
+| `NEXT_PUBLIC_BACKEND_URI` | ✅ | URL API backend |
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | ✅ | Firebase Web API key |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | ✅ | Firebase Auth domain |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | ✅ | Firebase project ID |
+| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | ✅ | Firebase Storage bucket |
+| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | ✅ | Firebase Messaging sender ID |
+| `NEXT_PUBLIC_FIREBASE_APP_ID` | ✅ | Firebase App ID |
+| `NEXT_PUBLIC_FIREBASE_VAPID_KEY` | ✅ | Firebase VAPID key (cho push notification) |
 
 ---
 
-## 🧪 Kiểm thử
+## ▶️ Chạy Ứng Dụng
+
+### Chế độ Development
+
+Mở **2 terminal** riêng biệt:
+
+**Terminal 1 — Backend:**
+
+```bash
+cd server
+npm run dev
+# Server chạy tại http://localhost:4000
+```
+
+**Terminal 2 — Frontend:**
+
+```bash
+cd client
+npm run dev
+# Client chạy tại http://localhost:3000
+```
+
+Mở trình duyệt và truy cập: **http://localhost:3000**
+
+### Build Production (Client)
+
+```bash
+cd client
+npm run build
+npm start
+```
+
+---
+
+## 🧪 Testing
 
 ### Chạy tất cả tests
 
 ```bash
-# Từ thư mục gốc
+# Từ thư mục root
 npm run test:all
 ```
 
-### Server tests (Jest)
+### Backend tests
 
 ```bash
 cd server
 
-# Chạy tests
+# Chạy unit & integration tests
 npm test
 
-# Chạy với coverage report
+# Chạy tests với coverage report
 npm run test:coverage
 
-# Chạy chế độ watch
+# Chạy tests ở chế độ watch
 npm run test:watch
 ```
 
-**Test structure:**
-- `server/tests/unit/` — Unit tests cho các module trong `lib/`
-- `server/tests/integration/` — Integration tests cho các routes
-- `server/tests/helpers/` — Test utilities và mock helpers
-
-### Client tests (Vitest)
+### Frontend tests
 
 ```bash
 cd client
 
-# Chạy tests
+# Chạy unit tests (Vitest)
 npm test
 
-# Chạy với coverage report
+# Chạy tests với coverage
 npm run test:coverage
 
-# Chạy chế độ watch
+# Chạy tests ở chế độ watch
 npm run test:watch
 ```
 
-**Test structure:**
-- `client/tests/unit/` — Unit tests cho hooks, context, components
-
-### End-to-End tests (Playwright)
+### E2E tests
 
 ```bash
 cd client
@@ -478,179 +429,95 @@ npx playwright install --with-deps chromium
 npm run test:e2e
 ```
 
-**Test structure:**
-- `client/tests/e2e/` — E2E tests cho user flows
+### CI/CD
 
-### Tổng quan test coverage
-
-| Loại test | Framework | Số lượng | Thư mục |
-|---|---|---|---|
-| Server Unit | Jest | 6 test files | `server/tests/unit/` |
-| Server Integration | Jest + Supertest | 4 test files | `server/tests/integration/` |
-| Client Unit | Vitest + Testing Library | 5 test files | `client/tests/unit/` |
-| Client E2E | Playwright | 1 spec file | `client/tests/e2e/` |
+Project sử dụng **GitHub Actions** để tự động chạy tests:
+- ✅ Backend tests + coverage trên mỗi push/PR
+- ✅ Frontend tests + coverage + build trên mỗi push/PR
+- ✅ E2E tests chạy khi trigger thủ công (`workflow_dispatch`)
 
 ---
 
-## 📂 Cấu trúc dự án
+## 🚢 Triển Khai (Deployment)
+
+### Backend — AWS SAM (Lambda + API Gateway)
+
+```bash
+# Build SAM application
+sam build
+
+# Deploy (lần đầu — guided mode)
+sam deploy --guided
+
+# Deploy (các lần sau)
+sam deploy
+```
+
+SAM template (`template.yaml`) sẽ tạo:
+- **WeatherHttpApi** — HTTP API Gateway với CORS configuration
+- **WeatherApiFunction** — Lambda function chạy Express API
+- **AlertSchedulerFunction** — Lambda function chạy theo lịch (EventBridge, mặc định 15 phút) để kiểm tra và gửi cảnh báo thời tiết
+
+> **Lưu ý:** Secrets (API keys, Firebase credentials) được quản lý qua **AWS Secrets Manager**. Xem `template.yaml` để biết chi tiết các parameter.
+
+### Frontend — AWS Amplify
+
+Frontend được deploy tự động qua **AWS Amplify** khi push code lên GitHub. Cấu hình build nằm trong `amplify.yml`:
+
+1. Kết nối repository GitHub với AWS Amplify Console
+2. Amplify tự động phát hiện `amplify.yml` và build Next.js app
+3. Sau khi deploy frontend, cập nhật `AppOrigin` parameter trong SAM với domain Amplify
+
+---
+
+## 🔌 API Endpoints
+
+Base URL: `http://localhost:4000` (local) hoặc API Gateway URL (production)
+
+| Method | Endpoint | Mô tả |
+|---|---|---|
+| `GET` | `/api?location={city}&units={metric\|imperial}` | Lấy thông tin thời tiết theo địa điểm |
+| `POST` | `/api/auth/login` | Đăng nhập admin |
+| `GET` | `/api/alerts/...` | Quản lý cảnh báo thời tiết |
+| `POST` | `/api/alerts/...` | Tạo/cập nhật subscription cảnh báo |
+| `GET` | `/api/admin/...` | Admin dashboard data |
+| `GET` | `/api/config` | Lấy runtime configuration |
+| `PATCH` | `/api/config` | Cập nhật runtime configuration (admin only) |
+
+---
+
+## 🤝 Đóng Góp
+
+Mọi đóng góp đều được chào đón! Vui lòng thực hiện theo các bước:
+
+1. **Fork** repository
+2. Tạo **branch** mới: `git checkout -b feature/ten-tinh-nang`
+3. **Commit** thay đổi: `git commit -m "feat: thêm tính năng XYZ"`
+4. **Push** lên branch: `git push origin feature/ten-tinh-nang`
+5. Tạo **Pull Request**
+
+### Quy ước commit message
 
 ```
-searching_weather/
-├── .github/
-│   └── workflows/
-│       └── test.yml                # CI pipeline (backend + frontend + e2e)
-├── client/                         # ── Frontend (Next.js 15) ──
-│   ├── app/
-│   │   ├── admin/
-│   │   │   └── page.tsx            # Trang admin dashboard
-│   │   ├── components/
-│   │   │   ├── activity-finder/    # Tìm thời điểm hoạt động tốt nhất
-│   │   │   ├── admin/              # Admin dashboard cards (8 files)
-│   │   │   ├── alerts/             # Banner + settings cảnh báo thời tiết
-│   │   │   ├── auth/               # Login page, auth gate
-│   │   │   ├── favorites/          # Quản lý thành phố yêu thích
-│   │   │   ├── pwa/                # Network status banner
-│   │   │   ├── recommendations/    # Gợi ý hoạt động theo thời tiết
-│   │   │   ├── weather-dashboard/  # Dashboard chính (current/hourly/daily)
-│   │   │   ├── header.tsx          # Header desktop
-│   │   │   ├── navbar.tsx          # Navbar mobile (responsive)
-│   │   │   ├── search-bar.tsx      # Thanh tìm kiếm + gợi ý thành phố
-│   │   │   ├── toggle.tsx          # Toggle đơn vị °C/°F
-│   │   │   ├── language-toggle.tsx # Toggle ngôn ngữ Vi/En
-│   │   │   ├── line-graph.tsx      # Biểu đồ nhiệt độ theo giờ
-│   │   │   └── weather-app.tsx     # App shell chính
-│   │   ├── context/                # React Context providers (7 files)
-│   │   ├── hooks/                  # Custom hooks (6 files)
-│   │   ├── lib/                    # Firebase config, storage utils
-│   │   ├── styles/                 # SCSS stylesheets
-│   │   ├── types/                  # TypeScript type definitions
-│   │   ├── utils/                  # Utility functions
-│   │   ├── layout.tsx              # Root layout (metadata, PWA)
-│   │   └── page.tsx                # Trang chính
-│   ├── public/
-│   │   ├── firebase-messaging-sw.js  # Local Firebase Messaging service worker (gitignored)
-│   │   ├── sw.js                     # PWA service worker
-│   │   ├── manifest.json             # PWA manifest
-│   │   └── icon.ico                  # App icon
-│   ├── tests/                      # Test files
-│   ├── next.config.ts              # Next.js configuration
-│   ├── vitest.config.ts            # Vitest configuration
-│   ├── playwright.config.ts        # Playwright configuration
-│   ├── eslint.config.mjs           # ESLint configuration
-│   └── package.json
-├── server/                         # ── Backend (Express.js) ──
-│   ├── lib/
-│   │   ├── api-metrics.js          # API call tracking, quota guard, latency
-│   │   ├── audit-log.js            # Ghi log hành động admin
-│   │   ├── auth.js                 # HMAC session tokens, admin middleware
-│   │   ├── firebase-admin.js       # Firebase Admin SDK initialization
-│   │   ├── runtime-config.js       # Hot-reload config từ Firestore
-│   │   ├── weather-checker.js      # Cron job kiểm tra alerts & gửi notification
-│   │   └── weather-service.js      # Gọi OpenWeather & Google Places API
-│   ├── routes/
-│   │   ├── admin.js                # Admin endpoints (health, config, broadcast)
-│   │   ├── alerts.js               # Alert subscription CRUD
-│   │   ├── auth.js                 # Login / logout / session check
-│   │   └── config.js               # Public config & SSE stream
-│   ├── tests/                      # Test files (unit + integration)
-│   ├── index.js                    # Express app factory & dev server
-│   ├── lambda.js                   # AWS Lambda handlers
-│   ├── jest.config.cjs             # Jest configuration
-│   ├── .env.example                # Template biến môi trường
-│   └── package.json
-├── template.yaml                   # AWS SAM template (Lambda + API Gateway)
-├── samconfig.toml                  # SAM deployment parameters
-├── amplify.yml                     # AWS Amplify build settings
-├── DEPLOYMENT.md                   # Hướng dẫn deploy lên AWS
-├── DEPLOYMENT_REPORT.md            # Báo cáo trạng thái deploy
-├── package.json                    # Root workspace scripts
-└── README.md                       # 📄 File này
+feat: thêm tính năng mới
+fix: sửa lỗi
+docs: cập nhật tài liệu
+style: thay đổi style (không ảnh hưởng logic)
+refactor: tái cấu trúc code
+test: thêm/sửa tests
+chore: cập nhật build tools, configs
 ```
 
 ---
 
-## 🔧 Xử lý sự cố
+## 📄 Giấy Phép
 
-### Server không khởi động được
-
-| Triệu chứng | Nguyên nhân | Giải pháp |
-|---|---|---|
-| `ADMIN_SESSION_SECRET is required` | Thiếu secret trong production | Thêm `ADMIN_SESSION_SECRET` vào `.env` |
-| `Firebase Admin initialization failed` | Service account không hợp lệ | Kiểm tra file `serviceAccountKey.json` hoặc biến `FIREBASE_SERVICE_ACCOUNT` |
-| `Port 4000 is already in use` | Port bị chiếm | Đổi `PORT` trong `.env` hoặc tắt process đang dùng port |
-
-### Client không hiển thị dữ liệu
-
-| Triệu chứng | Nguyên nhân | Giải pháp |
-|---|---|---|
-| Trang trắng / lỗi fetch | `NEXT_PUBLIC_BACKEND_URI` sai hoặc thiếu | Kiểm tra `client/.env.local`, đảm bảo server đang chạy |
-| "No results found" | Tên thành phố không tồn tại trong database gợi ý | Thử tên thành phố bằng tiếng Anh (ví dụ: "Ho Chi Minh City") |
-| "API Limit Exceeded" | Vượt quota OpenWeather | Chờ đến ngày hôm sau hoặc tăng `OPENWEATHER_DAILY_QUOTA_LIMIT` |
-
-### Push Notification không hoạt động
-
-| Triệu chứng | Nguyên nhân | Giải pháp |
-|---|---|---|
-| Không thấy nút bật notification | Thiếu Firebase config trên client | Điền đầy đủ biến `NEXT_PUBLIC_FIREBASE_*` trong `.env.local` |
-| Permission denied | User chưa cấp quyền notification | Click "Allow" khi trình duyệt hỏi |
-| Notification gửi không đến | FCM token hết hạn | Xóa subscription cũ, đăng ký lại |
-
-### Lỗi khi chạy tests
-
-| Triệu chứng | Nguyên nhân | Giải pháp |
-|---|---|---|
-| `Cannot find module` khi test server | Chưa install dependencies | Chạy `npm install` trong `server/` |
-| Playwright tests fail | Chưa cài browsers | Chạy `npx playwright install --with-deps chromium` |
-| E2E tests timeout | Server chưa chạy | E2E tests cần server chạy song song |
+Dự án này được phát hành theo giấy phép **ISC**.
 
 ---
 
-## 👥 Hướng dẫn sử dụng
+<div align="center">
 
-### Đăng nhập
+Được phát triển với ❤️ bởi nhóm WeCliFor
 
-Khi mở ứng dụng lần đầu, bạn sẽ thấy màn hình đăng nhập:
-
-- **Guest** — Nhấn nút đăng nhập Guest để sử dụng các tính năng cơ bản
-- **Admin** — Nhập mật khẩu admin (đã cấu hình trong `ADMIN_PASSWORD`) để truy cập panel quản trị
-
-### Tra cứu thời tiết
-
-1. Nhập tên thành phố vào thanh tìm kiếm (hỗ trợ gợi ý tự động)
-2. Nhấn **Enter** hoặc click icon 🔍
-3. Dashboard hiển thị: thời tiết hiện tại, dự báo theo giờ (biểu đồ), dự báo 7 ngày
-
-### Chuyển đổi đơn vị & ngôn ngữ
-
-- Click toggle **C/F** trên header để chuyển Celsius ↔ Fahrenheit
-- Click toggle **Vi/En** để chuyển ngôn ngữ
-
-### Quản lý yêu thích
-
-- Click icon ⭐ trên card thời tiết để thêm thành phố vào yêu thích
-- Mở panel yêu thích bằng icon ⭐ trên header
-- Click vào thành phố trong danh sách để xem nhanh
-
-### Thiết lập cảnh báo thời tiết
-
-1. Cuộn xuống phần **"Cảnh báo thời tiết"** trên dashboard
-2. Cấp quyền notification khi được hỏi
-3. Thêm rule mới: chọn metric (nhiệt độ/gió/mưa), ngưỡng, so sánh (trên/dưới)
-4. Server sẽ tự động kiểm tra và gửi notification khi điều kiện thỏa mãn
-
-### Admin Dashboard
-
-Truy cập bằng cách đăng nhập admin → click **"Trung tâm điều khiển"** hoặc truy cập `/admin`:
-
-- **Health** — Xem trạng thái server, database, Firebase
-- **API Usage** — Thống kê số request OpenWeather, quota còn lại
-- **API Key** — Xem (masked), validate, cập nhật OpenWeather key
-- **Feature Flags** — Bật/tắt tính năng AQI
-- **Broadcast** — Gửi thông báo đến tất cả user đăng ký notification
-- **Audit Log** — Xem lịch sử hành động admin
-
----
-
-## 📄 License
-
-ISC
+</div>
